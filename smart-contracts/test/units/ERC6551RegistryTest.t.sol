@@ -16,6 +16,11 @@ contract ERC6551RegistryTest is Test {
         uint256 salt
     );
 
+    // struct AccountInfor {
+    //     string userName;
+    //     string imageUri;
+    // }
+
     ERC6551Registry registry;
     ERC6551Account account;
     AccountNFT token;
@@ -25,21 +30,29 @@ contract ERC6551RegistryTest is Test {
 
     function setUp() external {
         account = new ERC6551Account();
-        token = new AccountNFT(owner, "");
+        token = new AccountNFT(owner);
         registry = new ERC6551Registry(owner, token, account);
     }
 
     function test_canCreateAccount() public {
         vm.startPrank(user);
-        token.mintNFT(user);
+        AccountNFT.AccountInfor memory accInfo = AccountNFT.AccountInfor({
+            userName: "user1",
+            ipfsImageHash: "testHashHere"
+        });
+        token.mintNFT(user, accInfo);
         registry.createAccount(block.chainid, address(token), 0, 0, "");
         vm.stopPrank();
     }
 
     function test_RevertIfTokenNotAllowed() public {
-        AccountNFT anotherToken = new AccountNFT(owner, "");
+        AccountNFT anotherToken = new AccountNFT(owner);
+        AccountNFT.AccountInfor memory accInfo = AccountNFT.AccountInfor({
+            userName: "user1",
+            ipfsImageHash: "testHashHere"
+        });
         vm.startPrank(user);
-        anotherToken.mintNFT(user);
+        anotherToken.mintNFT(user, accInfo);
         vm.expectRevert(ERC6551Registry.TokenNotAllowed.selector);
         registry.createAccount(block.chainid, address(anotherToken), 0, 0, "");
         vm.stopPrank();
