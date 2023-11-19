@@ -43,7 +43,6 @@ const Header = () => {
         >
           <Link className="flex items-center justify-center py-6" href={"/"}>
             <Image src={EELogo} height={80} width={80} alt="" />
-            <span className="font-bold text-xl">EtherEchelon</span>
           </Link>
           <nav className="flex items-center justify-between gap-8 font-bold text-base uppercase">
             <Link href="/">market</Link>

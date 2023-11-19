@@ -2,11 +2,12 @@ import React from "react";
 import { createCache, extractStyle, StyleProvider } from "@ant-design/cssinjs";
 import Document, { Head, Html, Main, NextScript } from "next/document";
 import type { DocumentContext } from "next/document";
+import { spaceMono } from "@/styles/font";
 
 const MyDocument = () => (
   <Html lang="en">
     <Head />
-    <body>
+    <body className={spaceMono.className}>
       <Main />
       <NextScript />
     </body>
