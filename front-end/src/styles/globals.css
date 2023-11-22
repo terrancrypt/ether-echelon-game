@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono&display=swap');
+
 body {
   color: white;
   background-color: black;
@@ -47,4 +49,13 @@ body::-webkit-scrollbar-track {
   pointer-events: none;
   transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
   z-index: -1;
+}
+
+
+/* Replace Antd Font For Form */
+.ant-form,
+.ant-input,
+.ant-select,
+.ant-select-single {
+  font-family: 'Space Mono', monospace !important;
 }

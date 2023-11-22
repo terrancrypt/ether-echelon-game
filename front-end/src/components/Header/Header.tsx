@@ -8,10 +8,17 @@ import shortenAddress from "@/utils/shortenAddress";
 import { Modal } from "antd";
 import { rubik } from "@/styles/font";
 
+interface AccountInfor {
+  username: string;
+  character: string;
+  tokenId: string;
+}
+
 const Header = () => {
   const [isClient, setIsClient] = useState(false);
   const { open } = useWeb3Modal();
   const { address, isDisconnected } = useAccount();
+  const [accountData, setAccountData] = useState<AccountInfor[] | null>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -22,10 +29,6 @@ const Header = () => {
 
   const showModal = () => {
     setIsModalOpen(true);
-  };
-
-  const handleOk = () => {
-    setIsModalOpen(false);
   };
 
   const handleCancel = () => {

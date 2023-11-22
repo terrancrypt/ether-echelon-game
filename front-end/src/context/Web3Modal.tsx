@@ -1,14 +1,21 @@
 import { ReactNode } from "react";
-import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
-import { WagmiConfig, configureChains } from "wagmi";
+import {
+  EIP6963Connector,
+  createWeb3Modal,
+  defaultWagmiConfig,
+} from "@web3modal/wagmi/react";
+import { WagmiConfig, configureChains, createConfig } from "wagmi";
 import { avalancheFuji, polygonMumbai } from "viem/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
+import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
+import { InjectedConnector } from "wagmi/connectors/injected";
+import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 
 const projectId = "8113267d88fce267d26e0b99c63b53a6";
 
 const { chains, publicClient } = configureChains(
-  [polygonMumbai, avalancheFuji],
+  [polygonMumbai],
   [
     alchemyProvider({ apiKey: "X5TDnhDZ4rXaZMJMggXrFQ-b5cySxi4O" }),
     publicProvider(),
@@ -22,7 +29,22 @@ const metadata = {
   icons: [""],
 };
 
-const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata });
+const wagmiConfig = createConfig({
+  autoConnect: true,
+  connectors: [
+    new WalletConnectConnector({
+      chains,
+      options: { projectId, showQrModal: false, metadata },
+    }),
+    new EIP6963Connector({ chains }),
+    new InjectedConnector({ chains, options: { shimDisconnect: true } }),
+    new CoinbaseWalletConnector({
+      chains,
+      options: { appName: metadata.name },
+    }),
+  ],
+  publicClient,
+});
 
 createWeb3Modal({ wagmiConfig, projectId, chains });
 
