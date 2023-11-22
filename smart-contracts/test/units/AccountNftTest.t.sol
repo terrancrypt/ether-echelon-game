@@ -23,7 +23,7 @@ contract AccountNftTest is Test {
 
     modifier mintNftToUser() {
         AccountNFT.AccountInfor memory accInfo = AccountNFT.AccountInfor({
-            userName: USER_NAME,
+            username: USER_NAME,
             ipfsImageHash: IPFS_HASH
         });
 
@@ -36,13 +36,13 @@ contract AccountNftTest is Test {
 
     function test_canMintNFT() public {
         AccountNFT.AccountInfor memory accInfo = AccountNFT.AccountInfor({
-            userName: USER_NAME,
+            username: USER_NAME,
             ipfsImageHash: IPFS_HASH
         });
 
         vm.startPrank(owner);
         token.addIpfsImageHash(IPFS_HASH);
-        token.mintNFT(user, accInfo);
+        uint256 tokenId = token.mintNFT(user, accInfo);
         vm.stopPrank();
 
         uint256 balanceOfUser = token.balanceOf(user);
@@ -52,16 +52,14 @@ contract AccountNftTest is Test {
             abi.encodePacked(
                 "data:application/json;base64,",
                 Base64.encode(
-                    bytes(
-                        abi.encodePacked(
-                            '{"name": "',
-                            tokenName,
-                            '", "image": "https://ipfs.io/ipfs/',
-                            IPFS_HASH,
-                            '", "userName": "',
-                            USER_NAME,
-                            '"}'
-                        )
+                    abi.encodePacked(
+                        '{"name": "',
+                        tokenName,
+                        '", "image": "https://ipfs.io/ipfs/',
+                        IPFS_HASH,
+                        '", "userName": "',
+                        USER_NAME,
+                        '"}'
                     )
                 )
             )
@@ -69,11 +67,12 @@ contract AccountNftTest is Test {
 
         assertEq(balanceOfUser, 1);
         assertEq(tokenUri, expectedTokenUri);
+        assertEq(tokenId, 0);
     }
 
     function test_revertIfExceedLength() public {
         AccountNFT.AccountInfor memory accInfo = AccountNFT.AccountInfor({
-            userName: "exampleUserName1",
+            username: "exampleUserName1",
             ipfsImageHash: IPFS_HASH
         });
 
@@ -82,9 +81,20 @@ contract AccountNftTest is Test {
         token.mintNFT(user, accInfo);
     }
 
+    function test_revertIfUsernameAlreadyExists() public mintNftToUser {
+        AccountNFT.AccountInfor memory accInfo = AccountNFT.AccountInfor({
+            username: USER_NAME,
+            ipfsImageHash: IPFS_HASH
+        });
+
+        vm.prank(owner);
+        vm.expectRevert(AccountNFT.AccountNFT_UsernameAlreadyExists.selector);
+        token.mintNFT(user, accInfo);
+    }
+
     function test_revertIfImageHashInvalid() public {
         AccountNFT.AccountInfor memory accInfo = AccountNFT.AccountInfor({
-            userName: USER_NAME,
+            username: USER_NAME,
             ipfsImageHash: "exampleInvalidHash"
         });
 
@@ -117,7 +127,7 @@ contract AccountNftTest is Test {
         vm.prank(owner);
         token.addIpfsImageHash(IPFS_HASH);
 
-        string memory expectedHash = token.getIpfsImageHash(0);
+        string memory expectedHash = token.getIpfsImageHashById(0);
 
         assertEq(IPFS_HASH, expectedHash);
     }

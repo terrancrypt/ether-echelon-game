@@ -8,9 +8,8 @@ contract DeployAccountNFT is Script {
     AccountNFT accountNft;
 
     function run() external {
-        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-
-        vm.startBroadcast(deployerPrivateKey);
+        vm.startBroadcast();
+        accountNft = new AccountNFT(0x7f4A3Fe909524CEa8C91fFdEf717C797581AE36D);
         vm.stopBroadcast();
     }
 }

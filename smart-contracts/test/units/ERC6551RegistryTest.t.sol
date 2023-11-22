@@ -37,7 +37,7 @@ contract ERC6551RegistryTest is Test {
     function test_canCreateAccount() public {
         vm.startPrank(user);
         AccountNFT.AccountInfor memory accInfo = AccountNFT.AccountInfor({
-            userName: "user1",
+            username: "user1",
             ipfsImageHash: "testHashHere"
         });
         token.mintNFT(user, accInfo);
@@ -48,7 +48,7 @@ contract ERC6551RegistryTest is Test {
     function test_RevertIfTokenNotAllowed() public {
         AccountNFT anotherToken = new AccountNFT(owner);
         AccountNFT.AccountInfor memory accInfo = AccountNFT.AccountInfor({
-            userName: "user1",
+            username: "user1",
             ipfsImageHash: "testHashHere"
         });
         vm.startPrank(user);

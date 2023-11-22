@@ -7,37 +7,42 @@ import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 
 contract AccountNFT is ERC721, Ownable {
     error AccountNFT_ExceededLength();
+    error AccountNFT_UsernameAlreadyExists();
     error AccountNFT_InvalidOwner();
     error AccountNFT_InvalidIpfsHash();
     error AccountNFT_ImageHashAlreadyExists();
 
-    uint256 private s_tokenCounter;
-
     struct AccountInfor {
-        string userName;
+        string username;
         string ipfsImageHash;
     }
-
     mapping(uint256 tokenId => AccountInfor) private s_tokenInfo;
+    uint256 private s_tokenCounter;
 
     mapping(string ipfsImageHash => bool isExists) private s_isImageHash;
-
     mapping(uint256 imageHashId => string ipfsImageHash)
         private s_ipfsImageHash;
     uint256 private s_currentImageHash;
+
+    mapping(string username => bool isExists) private s_isUsername;
 
     constructor(
         address initialOwner
     ) ERC721("Ether Echelon Account", "EEA") Ownable(initialOwner) {}
 
-    event UserNameUpdated(uint256 indexed tokenId, string newUserName);
+    event AccountNftMinted(address indexed owner, uint256 tokenId);
+    event UserNameUpdated(uint256 indexed tokenId, string newUsername);
 
     function mintNFT(
         address _owner,
         AccountInfor calldata _accountInfor
     ) external onlyOwner returns (uint256 tokenId) {
-        if (bytes(_accountInfor.userName).length > 15) {
+        string memory userName = _accountInfor.username;
+        if (bytes(userName).length > 15 || bytes(userName).length < 5) {
             revert AccountNFT_ExceededLength();
+        }
+        if (s_isUsername[userName] == true) {
+            revert AccountNFT_UsernameAlreadyExists();
         }
         if (s_isImageHash[_accountInfor.ipfsImageHash] == false) {
             revert AccountNFT_InvalidIpfsHash();
@@ -45,10 +50,13 @@ contract AccountNFT is ERC721, Ownable {
         _safeMint(_owner, s_tokenCounter);
         tokenId = s_tokenCounter;
         s_tokenInfo[tokenId] = AccountInfor({
-            userName: _accountInfor.userName,
+            username: userName,
             ipfsImageHash: _accountInfor.ipfsImageHash
         });
         s_tokenCounter++;
+        s_isUsername[userName] = true;
+
+        emit AccountNftMinted(_owner, tokenId);
     }
 
     function _baseURI() internal pure override returns (string memory) {
@@ -58,40 +66,47 @@ contract AccountNFT is ERC721, Ownable {
     function tokenURI(
         uint256 tokenId
     ) public view override returns (string memory) {
-        string memory userName = s_tokenInfo[tokenId].userName;
+        string memory username = s_tokenInfo[tokenId].username;
         string memory ipfsImageHash = s_tokenInfo[tokenId].ipfsImageHash;
+
         return
             string(
                 abi.encodePacked(
                     _baseURI(),
                     Base64.encode(
-                        bytes(
-                            abi.encodePacked(
-                                '{"name": "',
-                                name(),
-                                '", "image": "https://ipfs.io/ipfs/',
-                                ipfsImageHash,
-                                '", "userName": "',
-                                userName,
-                                '"}'
-                            )
+                        abi.encodePacked(
+                            '{"name": "',
+                            name(),
+                            '", "image": "https://ipfs.io/ipfs/',
+                            ipfsImageHash,
+                            '", "userName": "',
+                            username,
+                            '"}'
                         )
                     )
                 )
             );
     }
 
-    function updateUserName(uint256 tokenId, string memory newUserName) public {
+    function updateUserName(uint256 tokenId, string memory newUsername) public {
         if (_ownerOf(tokenId) != msg.sender) {
             revert AccountNFT_InvalidOwner();
         }
-        if (bytes(newUserName).length > 15) {
+        if (bytes(newUsername).length > 15 || bytes(newUsername).length < 5) {
             revert AccountNFT_ExceededLength();
         }
+        if (s_isUsername[newUsername] == true) {
+            revert AccountNFT_UsernameAlreadyExists();
+        }
 
-        s_tokenInfo[tokenId].userName = newUserName;
+        s_tokenInfo[tokenId].username = newUsername;
 
-        emit UserNameUpdated(tokenId, newUserName);
+        string memory pastUsername = s_tokenInfo[tokenId].username;
+
+        s_isUsername[newUsername] = true;
+        s_isUsername[pastUsername] = false;
+
+        emit UserNameUpdated(tokenId, newUsername);
     }
 
     function addIpfsImageHash(string memory _ipfsImageHash) external onlyOwner {
@@ -104,13 +119,17 @@ contract AccountNFT is ERC721, Ownable {
     }
 
     // ========== Getter Functions =========
-    function getIpfsImageHash(
+    function getCurrentTokenCount() public view returns (uint256) {
+        return s_tokenCounter;
+    }
+
+    function getIpfsImageHashById(
         uint256 _imageHashId
     ) public view returns (string memory) {
         return s_ipfsImageHash[_imageHashId];
     }
 
-    function getIpfsImageHash() public view returns (string[] memory) {
+    function getIpfsImageHashes() public view returns (string[] memory) {
         string[] memory arrIpfsHash = new string[](s_currentImageHash);
 
         for (uint256 i = 0; i < s_currentImageHash; i++) {
