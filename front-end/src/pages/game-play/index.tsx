@@ -1,24 +1,45 @@
 import React, { useEffect, useRef } from "react";
 import { getAccount } from "wagmi/actions";
 import GameLogin from "./components/GameLogin";
+import { draw } from "./game-logic/draw";
 
 const GamePlayPage = () => {
-  const componentRef = useRef<HTMLDivElement>(null);
+  const logInComponentRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const { address } = getAccount();
 
-  const onLogin = async (tokenId: string) => {};
+  useEffect(() => {
+    if (logInComponentRef.current) {
+      logInComponentRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [logInComponentRef]);
 
   useEffect(() => {
-    if (componentRef.current) {
-      componentRef.current.scrollIntoView({ behavior: "smooth" });
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const context = canvas.getContext("2d");
+
+    let animationFrameId: number;
+    if (context) {
+      animationFrameId = requestAnimationFrame(() => draw(context));
     }
-  }, [componentRef]);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [canvasRef, draw]);
 
   return (
     <div className="flex items-center justify-center">
-      <div ref={componentRef} className="inline-block relative scale-90">
+      <div ref={logInComponentRef} className="inline-block relative scale-90">
         <GameLogin />
-        <canvas className="bg-white" width={1140} height={640}></canvas>
+        <canvas
+          ref={canvasRef}
+          className="bg-white"
+          width={1140}
+          height={640}
+        ></canvas>
       </div>
     </div>
   );

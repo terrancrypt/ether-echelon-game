@@ -1,6 +1,6 @@
 import { Form, Select, Input, message, Spin, Tooltip } from "antd";
 import React, { useEffect, useState } from "react";
-import { charactersData } from "./data/characters";
+import { charactersData } from "../../data/characters";
 import Image from "next/image";
 import { spaceMono } from "@/styles/font";
 import {

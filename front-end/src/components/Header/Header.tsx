@@ -48,7 +48,7 @@ const Header = () => {
             <Image src={EELogo} height={80} width={80} alt="" />
           </Link>
           <nav className="flex items-center justify-between gap-8 font-bold text-base uppercase">
-            <Link href="/">market</Link>
+            <Link href="/game-play">PLAY</Link>
 
             <Link href="/">market</Link>
 

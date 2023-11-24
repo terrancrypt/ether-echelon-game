@@ -1,3 +1,4 @@
+import { charactersData } from "@/data/characters";
 import {
   checkOwner,
   getTokenUri,
@@ -37,11 +38,39 @@ const GameLogin = () => {
       }
 
       const tokenURI = await getTokenUri(tokenId);
-    } catch (error) {}
+      const splitUrl = tokenURI.image.split("/");
+      const imgHash = splitUrl.pop();
+
+      const characterKey =
+        Object.keys(charactersData).find(
+          (key) => charactersData[key].ipfsHash === imgHash
+        ) || null;
+
+      const loginInfor = {
+        owner: owner,
+        tokenId: tokenId,
+        character: characterKey,
+        accountAddr: "",
+      };
+
+      window.localStorage.setItem("loginInfor", JSON.stringify(loginInfor));
+
+      message.success("Login Success");
+
+      const component = document.querySelector<HTMLDivElement>(
+        "#GameLoginComponent"
+      );
+      if (component) component.style.display = "none";
+    } catch (error) {
+      message.error("Login error!");
+    }
   };
 
   return (
-    <div className="absolute top-[20%] left-[10%] text-black bg-white bg-opacity-90 border-2 border-black">
+    <div
+      id="GameLoginComponent"
+      className="absolute top-[20%] left-[10%] text-black bg-white bg-opacity-90 border-2 border-black"
+    >
       <div className="p-6">
         <h2 className="font-semibold text-xl">Welcome to Ether Echelon</h2>
         <span>Please login to play the game</span>
@@ -50,7 +79,7 @@ const GameLogin = () => {
             className="flex flex-col gap-2 mt-6"
             onSubmit={handleLoginSubmit}
           >
-            <label htmlFor="tokenId">Your TokenId</label>
+            <span>Your TokenId</span>
             <input
               className="border border-black"
               type="text"
