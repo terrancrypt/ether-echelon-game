@@ -13,6 +13,9 @@ import React, {
   useState,
 } from "react";
 import { getAccount } from "wagmi/actions";
+import { startAnimation, stopAnimation } from "../game-logic/draw";
+import { Sprites } from "../game-logic/class/Sprites";
+import { Person } from "../game-logic/class/Person";
 
 const GameLogin = () => {
   const [tokenId, setTokenId] = useState("");
@@ -61,6 +64,24 @@ const GameLogin = () => {
         "#GameLoginComponent"
       );
       if (component) component.style.display = "none";
+
+      stopAnimation("loginBackground");
+
+      if (characterKey) {
+        const dataCharacter = charactersData[characterKey];
+
+        const player = new Person(0, 0, dataCharacter.sprites.down, {
+          up: dataCharacter.sprites.up,
+          down: dataCharacter.sprites.down,
+          left: dataCharacter.sprites.left,
+          right: dataCharacter.sprites.right,
+        });
+
+        const overworld = new Sprites(100, -700, "images/Overworld.png");
+
+        startAnimation(overworld, "overworld", false, false);
+        startAnimation(player, "player", false, true);
+      }
     } catch (error) {
       message.error("Login error!");
     }

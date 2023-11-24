@@ -1,11 +1,15 @@
-import React, { useEffect, useRef } from "react";
+import React, { ChangeEvent, useEffect, useRef } from "react";
 import { getAccount } from "wagmi/actions";
 import GameLogin from "./components/GameLogin";
-import { draw } from "./game-logic/draw";
+import { Sprites } from "./game-logic/class/Sprites";
+import { draw, startAnimation, stopAnimation } from "./game-logic/draw";
+import { charactersData } from "@/data/characters";
+import { Person } from "./game-logic/class/Person";
+import { Boundary } from "./game-logic/class/Boundary";
+import { collisionsData } from "@/data/collisions";
 
 const GamePlayPage = () => {
   const logInComponentRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const { address } = getAccount();
 
   useEffect(() => {
@@ -15,27 +19,54 @@ const GamePlayPage = () => {
   }, [logInComponentRef]);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    // const loginBackground = new Sprites(
+    //   0,
+    //   -100,
+    //   "images/windrise-background.png"
+    // );
+    // startAnimation(loginBackground, "loginBackground", true, false);
 
-    const context = canvas.getContext("2d");
+    // ========= Test
 
-    let animationFrameId: number;
-    if (context) {
-      animationFrameId = requestAnimationFrame(() => draw(context));
-    }
+    const component = document.querySelector<HTMLDivElement>(
+      "#GameLoginComponent"
+    );
+    if (component) component.style.display = "none";
 
+    const dataCharacter = charactersData["AdventureGirl"];
+
+    const overworld = new Sprites(0, 0, "images/Overworld.png");
+
+    const player = new Person(
+      0,
+      0,
+      dataCharacter.sprites.down,
+      {
+        up: dataCharacter.sprites.up,
+        down: dataCharacter.sprites.down,
+        left: dataCharacter.sprites.left,
+        right: dataCharacter.sprites.right,
+      },
+      overworld
+    );
+
+    startAnimation(overworld, "overworld", false, false);
+    startAnimation(player, "player", false, true);
+
+    // End Test
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      stopAnimation("loginBackground");
+      stopAnimation("player");
+      stopAnimation("overworld");
     };
-  }, [canvasRef, draw]);
+  }, [draw]);
 
   return (
     <div className="flex items-center justify-center">
       <div ref={logInComponentRef} className="inline-block relative scale-90">
         <GameLogin />
         <canvas
-          ref={canvasRef}
+          id="GameCanvas"
           className="bg-white"
           width={1140}
           height={640}
