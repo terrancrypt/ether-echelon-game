@@ -1,9 +1,5 @@
 import { ReactNode } from "react";
-import {
-  EIP6963Connector,
-  createWeb3Modal,
-  defaultWagmiConfig,
-} from "@web3modal/wagmi/react";
+import { EIP6963Connector, createWeb3Modal } from "@web3modal/wagmi/react";
 import { WagmiConfig, configureChains, createConfig } from "wagmi";
 import { avalancheFuji, polygonMumbai } from "viem/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";

@@ -1,8 +1,12 @@
-import { accountNftContract } from "@/services/contract-services/AccountNftServ";
+import { accountNftContract } from "../services/contract-services/AccountNftServ";
+
+interface WindowChain extends Window {
+  ethereum?: any;
+}
 
 const addTokenToWallet = async (tokenId: string): Promise<boolean> => {
   try {
-    const wasAdded = await (window.ethereum as any).request({
+    const wasAdded = await (window as WindowChain).ethereum.request({
       method: "wallet_watchAsset",
       params: {
         type: "ERC721",

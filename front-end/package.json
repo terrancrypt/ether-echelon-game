@@ -1,39 +1,36 @@
 {
-  "name": "ether-echelon-front-end",
-  "version": "0.1.0",
+  "name": "front-end-2",
   "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@ant-design/cssinjs": "^1.17.2",
-    "@pinata/sdk": "^2.1.0",
-    "@types/formidable": "^3.4.5",
-    "@web3modal/wagmi": "^3.2.0",
-    "antd": "^5.11.0",
-    "axios": "^1.6.1",
-    "dotenv": "^16.3.1",
-    "formidable": "^2.1.2",
-    "mongodb": "^6.3.0",
-    "multer": "^1.4.5-lts.1",
-    "next": "14.0.1",
-    "react": "^18",
-    "react-dom": "^18",
-    "viem": "^1.18.9",
-    "wagmi": "^1.4.6"
+    "@web3modal/wagmi": "^3.3.2",
+    "antd": "^5.11.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0",
+    "viem": "^1.19.9",
+    "wagmi": "^1.4.7"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "autoprefixer": "^10.0.1",
-    "eslint": "^8",
-    "eslint-config-next": "14.0.1",
-    "postcss": "^8",
-    "tailwindcss": "^3.3.0",
-    "typescript": "^5"
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
+    "@vitejs/plugin-react-swc": "^3.5.0",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.53.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.4",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.0"
   }
 }
