@@ -1,6 +1,6 @@
 import { createWeb3Modal, EIP6963Connector } from "@web3modal/wagmi";
 
-import { configureChains, createConfig } from "@wagmi/core";
+import { configureChains, createConfig, getAccount } from "@wagmi/core";
 import { polygonMumbai } from "viem/chains";
 import { publicProvider } from "@wagmi/core/providers/public";
 import { InjectedConnector } from "@wagmi/core";
@@ -43,3 +43,7 @@ const wagmiConfig = createConfig({
 });
 
 createWeb3Modal({ wagmiConfig, projectId, chains });
+
+const { address } = getAccount();
+
+export { address };

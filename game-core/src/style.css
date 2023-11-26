@@ -30,3 +30,11 @@ body {
   background-color: transparent;
   border: none;
 }
+
+.login-container {
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  border: 1px solid black;
+  padding: 10px;
+}
