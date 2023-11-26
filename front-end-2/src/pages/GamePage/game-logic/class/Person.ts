@@ -38,7 +38,12 @@ export class Person extends Sprites {
     this.sprites = sprites;
     this.keyboardManager = new KeyboardManager();
     this.movables = movables;
-    if (this.image) this.width = this.image?.width / this.frame.max;
+
+    if (this.image)
+      this.image.onload = () => {
+        if (this.image?.width) this.width = this.image?.width / this.frame.max;
+        this.height = this.image?.height;
+      };
   }
 
   draw() {
@@ -74,37 +79,77 @@ export class Person extends Sprites {
       if (this.keyboardManager.isKeyPressed("w")) {
         this.moving = true;
 
-        if (this.checkCollisionWithBoundary()) {
-          this.movables.forEach((movable) => {
-            movable.updateMovingPosition("up", 0);
-          });
-        } else {
-          this.movables.forEach((movable) => {
-            movable.updateMovingPosition("up", speed);
-          });
+        for (let i = 0; i < this.movables.length; i++) {
+          const boundary = this.movables[i];
+          if (boundary instanceof Boundary) {
+            if (
+              this.rectangularCollision({
+                ...boundary,
+                position: {
+                  x: boundary.position.x,
+                  y: boundary.position.y + 3,
+                },
+              })
+            ) {
+              this.moving = false;
+              break;
+            }
+          }
         }
 
         if (this.moving) {
           this.image.src = this.sprites.up;
+          this.movables.forEach((movable) => {
+            movable.updateMovingPosition("up", speed);
+          });
         }
       } else if (this.keyboardManager.isKeyPressed("s")) {
         this.moving = true;
 
-        if (this.checkCollisionWithBoundary()) {
-          this.movables.forEach((movable) => {
-            movable.updateMovingPosition("down", 0);
-          });
-        } else {
-          this.movables.forEach((movable) => {
-            movable.updateMovingPosition("down", speed);
-          });
+        for (let i = 0; i < this.movables.length; i++) {
+          const boundary = this.movables[i];
+          if (boundary instanceof Boundary) {
+            if (
+              this.rectangularCollision({
+                ...boundary,
+                position: {
+                  x: boundary.position.x,
+                  y: boundary.position.y - 3,
+                },
+              })
+            ) {
+              this.moving = false;
+              break;
+            }
+          }
         }
 
         if (this.moving) {
           this.image.src = this.sprites.down;
+          this.movables.forEach((movable) => {
+            movable.updateMovingPosition("down", speed);
+          });
         }
       } else if (this.keyboardManager.isKeyPressed("a")) {
         this.moving = true;
+
+        for (let i = 0; i < this.movables.length; i++) {
+          const boundary = this.movables[i];
+          if (boundary instanceof Boundary) {
+            if (
+              this.rectangularCollision({
+                ...boundary,
+                position: {
+                  x: boundary.position.x + 3,
+                  y: boundary.position.y,
+                },
+              })
+            ) {
+              this.moving = false;
+              break;
+            }
+          }
+        }
 
         if (this.moving) {
           this.image.src = this.sprites.left;
@@ -115,15 +160,23 @@ export class Person extends Sprites {
       } else if (this.keyboardManager.isKeyPressed("d")) {
         this.moving = true;
 
-        this.movables.forEach((movable) => {
-          if (movable instanceof Boundary) {
-            if (this.width) {
-              if (this.position.x + this.width >= movable.position.x) {
-                console.log("Colliding!");
-              }
+        for (let i = 0; i < this.movables.length; i++) {
+          const boundary = this.movables[i];
+          if (boundary instanceof Boundary) {
+            if (
+              this.rectangularCollision({
+                ...boundary,
+                position: {
+                  x: boundary.position.x - 3,
+                  y: boundary.position.y,
+                },
+              })
+            ) {
+              this.moving = false;
+              break;
             }
           }
-        });
+        }
 
         if (this.moving) {
           this.image.src = this.sprites.right;
@@ -162,6 +215,23 @@ export class Person extends Sprites {
       rect1.y < rect2.y + rect2.height &&
       rect1.y + rect1.height > rect2.y
     );
+  }
+
+  rectangularCollision(boundary: any): boolean {
+    if (this.width && boundary.width && this.height) {
+      return (
+        // Bên trái sang
+        this.position.x + this.width >= boundary.position.x &&
+        // Bên phải sang
+        this.position.x <= boundary.position.x + boundary.width &&
+        // Bên dưới lên
+        this.position.y <= boundary.position.y + boundary.width &&
+        // Bên trên xuống
+        this.position.y + this.height >= boundary.position.y
+      );
+    } else {
+      return false;
+    }
   }
 
   getBounds() {

@@ -1,13 +1,30 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import GameLogin from "./components/GameLogin";
-import { draw, startAnimation, stopAnimation } from "./game-logic/draw";
+import {
+  draw,
+  drawOverworld,
+  startAnimation,
+  stopAnimation,
+} from "./game-logic/draw";
 import { Sprites } from "./game-logic/class/Sprites";
 import { charactersData } from "../../data/charaters";
 import { Person } from "./game-logic/class/Person";
 import { Boundary } from "./game-logic/class/Boundary";
+import { collisionsData } from "../../data/collisions";
+import PlayerInfor from "./components/PlayerInfor";
+
+export interface PlayerInfor {
+  tokenId: string;
+  characterKey: string;
+}
 
 const GamePage = () => {
   const logInComponentRef = useRef<HTMLDivElement>(null);
+  const [isLogin, setIsLogin] = useState<boolean>(true);
+  const [playerInfor, setPlayerInfor] = useState<PlayerInfor>({
+    tokenId: "",
+    characterKey: "LumberJack",
+  });
 
   // Move to canvas
   useEffect(() => {
@@ -18,13 +35,6 @@ const GamePage = () => {
 
   // Start draw canvas & game logic
   useEffect(() => {
-    //   const loginBackground = new Sprites(
-    //     0,
-    //     -100,
-    //     "images/windrise-background.png"
-    //   );
-    //   startAnimation(loginBackground, "loginBackground", true, false);
-
     const component = document.querySelector<HTMLDivElement>(
       "#GameLoginComponent"
     );
@@ -33,12 +43,25 @@ const GamePage = () => {
     const canvas: HTMLCanvasElement | null =
       document.querySelector("#GameCanvas");
 
-    if (canvas) {
-      const overworld = new Sprites(-400, -700, "images/Overworld.png");
-      const dataCharacter = charactersData["AdventureGirl"];
-      const boundary = new Boundary(200, 200);
+    if (canvas && isLogin) {
+      const offset = { x: -400, y: -700 };
+      const overworld = new Sprites(offset.x, offset.y, "images/Overworld.png");
+      const dataCharacter = charactersData[playerInfor.characterKey];
 
-      const movables = [overworld, boundary];
+      const collisionsMap = [];
+      for (let i = 0; i < collisionsData.length; i += 70) {
+        collisionsMap.push(collisionsData.slice(i, 70 + i));
+      }
+
+      const boundaries: Boundary[] = [];
+      collisionsMap.forEach((row: number[], i: number) => {
+        row.forEach((symbol: number, j: number) => {
+          if (symbol === 675)
+            boundaries.push(new Boundary(j * 64 + offset.x, i * 64 + offset.y));
+        });
+      });
+
+      const movables = [overworld, ...boundaries];
 
       const player = new Person(
         canvas.width / 2 - 192 / 4 / 2,
@@ -53,29 +76,31 @@ const GamePage = () => {
         movables
       );
 
-      startAnimation(overworld, "overworld", false, false);
-      startAnimation(boundary, "boundary", false, false);
-      startAnimation(player, "player", false, true);
+      drawOverworld({
+        map: overworld,
+        player,
+        boundaries,
+      });
     }
 
     // Stop all animation if component unmounted
     return () => {
       stopAnimation("loginBackground");
-      stopAnimation("player");
       stopAnimation("overworld");
     };
-  }, []);
+  }, [isLogin]);
 
   return (
     <div className="flex items-center justify-center">
       <div ref={logInComponentRef} className="inline-block relative scale-90">
-        <GameLogin />
+        <GameLogin setIsLogin={setIsLogin} setPlayerInfor={setPlayerInfor} />
         <canvas
           id="GameCanvas"
           className="bg-white"
           width={1140}
           height={640}
         ></canvas>
+        <PlayerInfor />
       </div>
     </div>
   );

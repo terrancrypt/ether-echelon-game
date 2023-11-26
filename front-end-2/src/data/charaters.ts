@@ -30,10 +30,10 @@ export const charactersData: CharactersData = {
     avatarImg: "/images/Characters/LumberJack/LumberJack.png",
     inGameImg: "/images/Characters/LumberJack/LumberJack.gif",
     sprites: {
-      up: "",
-      down: "",
-      left: "",
-      right: "",
+      up: "images/Characters/LumberJack/LumberJackUp.png",
+      down: "images/Characters/LumberJack/LumberJackDown.png",
+      left: "images/Characters/LumberJack/LumberJackLeft.png",
+      right: "images/Characters/LumberJack/LumberJackRight.png",
     },
   },
 
@@ -42,10 +42,10 @@ export const charactersData: CharactersData = {
     avatarImg: "/images/Characters/Nurse/Nurse.png",
     inGameImg: "/images/Characters/Nurse/Nurse.gif",
     sprites: {
-      up: "",
-      down: "",
-      left: "",
-      right: "",
+      up: "images/Characters/Nurse/NurseUp.png",
+      down: "images/Characters/Nurse/NurseDown.png",
+      left: "images/Characters/Nurse/NurseLeft.png",
+      right: "images/Characters/Nurse/NurseRight.png",
     },
   },
 
@@ -54,10 +54,10 @@ export const charactersData: CharactersData = {
     avatarImg: "/images/Characters/OfficeWorker/OfficeWorker.png",
     inGameImg: "/images/Characters/OfficeWorker/OfficeWorker.gif",
     sprites: {
-      up: "",
-      down: "",
-      left: "",
-      right: "",
+      up: "images/Characters/OfficeWorker/OfficeWorkerUp.png",
+      down: "images/Characters/OfficeWorker/OfficeWorkerDown.png",
+      left: "images/Characters/OfficeWorker/OfficeWorkerLeft.png",
+      right: "images/Characters/OfficeWorker/OfficeWorkerRight.png",
     },
   },
 
@@ -66,10 +66,10 @@ export const charactersData: CharactersData = {
     avatarImg: "/images/Characters/OldMan/OldMan.png",
     inGameImg: "/images/Characters/OldMan/OldMan.gif",
     sprites: {
-      up: "",
-      down: "",
-      left: "",
-      right: "",
+      up: "images/Characters/OldMan/OldManUp.png",
+      down: "images/Characters/OldMan/OldManDown.png",
+      left: "images/Characters/OldMan/OldManLeft.png",
+      right: "images/Characters/OldMan/OldManRight.png",
     },
   },
 
@@ -78,10 +78,10 @@ export const charactersData: CharactersData = {
     avatarImg: "/images/Characters/PoliceOfficer/PoliceOfficer.png",
     inGameImg: "/images/Characters/PoliceOfficer/PoliceOfficer.gif",
     sprites: {
-      up: "",
-      down: "",
-      left: "",
-      right: "",
+      up: "images/Characters/PoliceOfficer/PoliceOfficerUp.png",
+      down: "images/Characters/PoliceOfficer/PoliceOfficerDown.png",
+      left: "images/Characters/PoliceOfficer/PoliceOfficerLeft.png",
+      right: "images/Characters/PoliceOfficer/PoliceOfficerRight.png",
     },
   },
 
@@ -90,10 +90,10 @@ export const charactersData: CharactersData = {
     avatarImg: "/images/Characters/Professor/Professor.png",
     inGameImg: "/images/Characters/Professor/Professor.gif",
     sprites: {
-      up: "",
-      down: "",
-      left: "",
-      right: "",
+      up: "images/Characters/Professor/ProfessorUp.png",
+      down: "images/Characters/Professor/ProfessorDown.png",
+      left: "images/Characters/Professor/ProfessorLeft.png",
+      right: "images/Characters/Professor/ProfessorRight.png",
     },
   },
 
@@ -102,10 +102,10 @@ export const charactersData: CharactersData = {
     avatarImg: "/images/Characters/RichOldMan/RichOldMan.png",
     inGameImg: "/images/Characters/RichOldMan/RichOldMan.gif",
     sprites: {
-      up: "",
-      down: "",
-      left: "",
-      right: "",
+      up: "images/Characters/RichOldMan/RichOldManUp.png",
+      down: "images/Characters/RichOldMan/RichOldManDown.png",
+      left: "images/Characters/RichOldMan/RichOldManLeft.png",
+      right: "images/Characters/RichOldMan/RichOldManRight.png",
     },
   },
 
@@ -114,10 +114,10 @@ export const charactersData: CharactersData = {
     avatarImg: "/images/Characters/YoungBoy/YoungBoy.png",
     inGameImg: "/images/Characters/YoungBoy/YoungBoy.gif",
     sprites: {
-      up: "",
-      down: "",
-      left: "",
-      right: "",
+      up: "images/Characters/YoungBoy/YoungBoyUp.png",
+      down: "images/Characters/YoungBoy/YoungBoyDown.png",
+      left: "images/Characters/YoungBoy/YoungBoyLeft.png",
+      right: "images/Characters/YoungBoy/YoungBoyRight.png",
     },
   },
 };

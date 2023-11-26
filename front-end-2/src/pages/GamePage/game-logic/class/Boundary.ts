@@ -8,7 +8,7 @@ export class Boundary extends Sprites {
   }
   draw() {
     if (this.ctx && this.width !== undefined && this.height !== undefined) {
-      this.ctx.fillStyle = "rgba(255, 0, 0, 1)";
+      this.ctx.fillStyle = "rgba(255, 0, 0, 0)";
       this.ctx.fillRect(
         this.position.x,
         this.position.y,

@@ -1,5 +1,5 @@
 import { message } from "antd";
-import { ChangeEvent, FormEvent, useState } from "react";
+import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { getAccount } from "wagmi/actions";
 import { startAnimation, stopAnimation } from "../game-logic/draw";
 import {
@@ -8,11 +8,18 @@ import {
 } from "../../../services/contract-services/AccountNftServ";
 import { NavLink } from "react-router-dom";
 import { charactersData } from "../../../data/charaters";
-import { Person } from "../game-logic/class/Person";
 import { Sprites } from "../game-logic/class/Sprites";
-import { Boundary } from "../game-logic/class/Boundary";
+import { PlayerInfor } from "../GamePage";
 
-const GameLogin = () => {
+interface GameLoginProps {
+  setIsLogin: React.Dispatch<React.SetStateAction<boolean>>;
+  setPlayerInfor: React.Dispatch<React.SetStateAction<PlayerInfor>>;
+}
+
+const GameLogin: React.FC<GameLoginProps> = ({
+  setIsLogin,
+  setPlayerInfor,
+}) => {
   const [tokenId, setTokenId] = useState("");
   const { address } = getAccount();
 
@@ -51,6 +58,12 @@ const GameLogin = () => {
         accountAddr: "",
       };
 
+      if (characterKey)
+        setPlayerInfor({
+          tokenId,
+          characterKey,
+        });
+
       window.localStorage.setItem("loginInfor", JSON.stringify(loginInfor));
 
       message.success("Login Success");
@@ -62,35 +75,21 @@ const GameLogin = () => {
 
       stopAnimation("loginBackground");
 
-      if (characterKey) {
-        const dataCharacter = charactersData[characterKey];
-
-        const overworld = new Sprites(100, -700, "images/Overworld.png");
-        const boundary = new Boundary(0, 0);
-
-        const movables = [overworld];
-
-        const player = new Person(
-          0,
-          0,
-          dataCharacter.sprites.down,
-          {
-            up: dataCharacter.sprites.up,
-            down: dataCharacter.sprites.down,
-            left: dataCharacter.sprites.left,
-            right: dataCharacter.sprites.right,
-          },
-          movables
-        );
-
-        startAnimation(overworld, "overworld", false, false);
-        startAnimation(boundary, "boundary", false, false);
-        startAnimation(player, "player", false, true);
-      }
+      setIsLogin(true);
     } catch (error) {
       message.error("Login error!");
     }
   };
+
+  // Start background animation
+  useEffect(() => {
+    const loginBackground = new Sprites(
+      0,
+      -100,
+      "images/windrise-background.png"
+    );
+    startAnimation(loginBackground, "loginBackground", true);
+  }, []);
 
   return (
     <div
