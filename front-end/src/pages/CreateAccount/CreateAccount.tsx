@@ -139,7 +139,7 @@ const CreateAccountPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="container flex justify-center">
+    <div className="container flex justify-center tracking-tighter">
       {isLoading ? (
         <div className="mt-12 flex justify-center items-center">
           <div className="flex flex-col justify-center gap-8">

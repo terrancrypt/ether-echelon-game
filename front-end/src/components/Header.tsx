@@ -9,6 +9,7 @@ import { shortenAddr } from "../utils/addrUtils";
 const Header = () => {
   const { open } = useWeb3Modal();
   const { address, isDisconnected } = useAccount();
+  const [isHovered, setIsHovered] = useState(false);
 
   // Antd Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,14 +25,37 @@ const Header = () => {
   return (
     <>
       <header
-        className={"container flex items-center justify-between border-b "}
+        className={
+          "container flex items-center justify-between border-b tracking-tighter"
+        }
       >
         <NavLink className="flex items-center justify-center py-2" to={"/"}>
           <img src={EELogo} height={80} width={80} alt="" />
         </NavLink>
-        <nav className="flex items-center justify-between gap-8 font-bold text-xs uppercase">
-          <NavLink to="/play">play</NavLink>
-          <NavLink to="/create-account">create account</NavLink>
+        <nav className="flex items-center justify-between gap-8 font-bold text-xs uppercase relative">
+          <NavLink className="hover:underline" to="/play">
+            play
+          </NavLink>
+          <NavLink className="hover:underline" to="/create-account">
+            create-account
+          </NavLink>
+          <div
+            className="relative"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            <p className="hover:underline cursor-pointer">game-information</p>
+            {isHovered && (
+              <div className="absolute right-0 top-4 bg-black border p-4 space-y-4 flex flex-col">
+                <NavLink to="/beasts" className="hover:underline">
+                  Ether Beasts
+                </NavLink>
+                <NavLink to="/skills" className="hover:underline">
+                  Skills
+                </NavLink>
+              </div>
+            )}
+          </div>
         </nav>
         <>
           {isDisconnected ? (

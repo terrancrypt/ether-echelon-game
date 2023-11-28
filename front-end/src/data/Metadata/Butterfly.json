@@ -1,12 +1,13 @@
 {
-  "name": "RedButterfly",
+  "name": "Butterfly",
   "image": "https://ipfs.io/ipfs/QmYtMP4uAeWp7BEPNMyMwo14UD2P5GpbMzC1BqBiYnquQX",
   "attributes": {
     "evolutionable": false,
+    "rarity": "Normal",
     "type": "Fire",
-    "hp": 450,
+    "hp": 480,
     "attack": 20,
-    "defend": 15,
-    "skills": ["Slash Double", "Burn"]
+    "defend": 10,
+    "skills": ["Slash Curved", "Burn"]
   }
 }

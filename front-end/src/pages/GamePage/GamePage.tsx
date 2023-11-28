@@ -12,19 +12,20 @@ import { Person } from "./game-logic/class/Person";
 import { Boundary } from "./game-logic/class/Boundary";
 import { collisionsData } from "../../data/collisions";
 import PlayerInfor from "./components/PlayerInfor";
+import { initFireBase } from "../../services/firebase/firebase";
+import initGame from "./game-logic/initGame";
+import { UserDataType } from "../../services/firebase/UserDataType";
 
 export interface PlayerInfor {
   tokenId: string;
   characterKey: string;
+  username: string;
 }
 
 const GamePage = () => {
   const logInComponentRef = useRef<HTMLDivElement>(null);
   const [isLogin, setIsLogin] = useState<boolean>(true);
-  const [playerInfor, setPlayerInfor] = useState<PlayerInfor>({
-    tokenId: "",
-    characterKey: "LumberJack",
-  });
+  const [playerInfor, setPlayerInfor] = useState<UserDataType | null>(null);
 
   // Move to canvas
   useEffect(() => {
@@ -35,52 +36,51 @@ const GamePage = () => {
 
   // Start draw canvas & game logic
   useEffect(() => {
-    const component = document.querySelector<HTMLDivElement>(
-      "#GameLoginComponent"
-    );
-    if (component) component.style.display = "none";
+    initFireBase();
+
+    // const component = document.querySelector<HTMLDivElement>(
+    //   "#GameLoginComponent"
+    // );
+    // if (component) component.style.display = "none";
 
     const canvas: HTMLCanvasElement | null =
       document.querySelector("#GameCanvas");
 
-    if (canvas && isLogin) {
-      const offset = { x: -400, y: -700 };
-      const overworld = new Sprites(offset.x, offset.y, "images/Overworld.png");
-      const dataCharacter = charactersData[playerInfor.characterKey];
+    if (canvas && isLogin && playerInfor) {
+      // const offset = { x: -400, y: -700 };
+      // const overworld = new Sprites(offset.x, offset.y, "images/Overworld.png");
+      // const dataCharacter = charactersData[playerInfor.characterKey];
+      // const collisionsMap = [];
+      // for (let i = 0; i < collisionsData.length; i += 70) {
+      //   collisionsMap.push(collisionsData.slice(i, 70 + i));
+      // }
+      // const boundaries: Boundary[] = [];
+      // collisionsMap.forEach((row: number[], i: number) => {
+      //   row.forEach((symbol: number, j: number) => {
+      //     if (symbol === 675)
+      //       boundaries.push(new Boundary(j * 64 + offset.x, i * 64 + offset.y));
+      //   });
+      // });
+      // const movables = [overworld, ...boundaries];
+      // const player = new Person(
+      //   canvas.width / 2 - 192 / 4 / 2,
+      //   canvas.height / 2 - 68 / 2,
+      //   dataCharacter.sprites.down,
+      //   {
+      //     up: dataCharacter.sprites.up,
+      //     down: dataCharacter.sprites.down,
+      //     left: dataCharacter.sprites.left,
+      //     right: dataCharacter.sprites.right,
+      //   },
+      //   movables
+      // );
+      // drawOverworld({
+      //   map: overworld,
+      //   player,
+      //   boundaries,
+      // });
 
-      const collisionsMap = [];
-      for (let i = 0; i < collisionsData.length; i += 70) {
-        collisionsMap.push(collisionsData.slice(i, 70 + i));
-      }
-
-      const boundaries: Boundary[] = [];
-      collisionsMap.forEach((row: number[], i: number) => {
-        row.forEach((symbol: number, j: number) => {
-          if (symbol === 675)
-            boundaries.push(new Boundary(j * 64 + offset.x, i * 64 + offset.y));
-        });
-      });
-
-      const movables = [overworld, ...boundaries];
-
-      const player = new Person(
-        canvas.width / 2 - 192 / 4 / 2,
-        canvas.height / 2 - 68 / 2,
-        dataCharacter.sprites.down,
-        {
-          up: dataCharacter.sprites.up,
-          down: dataCharacter.sprites.down,
-          left: dataCharacter.sprites.left,
-          right: dataCharacter.sprites.right,
-        },
-        movables
-      );
-
-      drawOverworld({
-        map: overworld,
-        player,
-        boundaries,
-      });
+      initGame(canvas, playerInfor);
     }
 
     // Stop all animation if component unmounted

@@ -10,6 +10,7 @@ import { NavLink } from "react-router-dom";
 import { charactersData } from "../../../data/charaters";
 import { Sprites } from "../game-logic/class/Sprites";
 import { PlayerInfor } from "../GamePage";
+import { writeUserData } from "../../../services/firebase/firebase";
 
 interface GameLoginProps {
   setIsLogin: React.Dispatch<React.SetStateAction<boolean>>;
@@ -46,6 +47,8 @@ const GameLogin: React.FC<GameLoginProps> = ({
       const splitUrl = tokenURI.image.split("/");
       const imgHash = splitUrl.pop();
 
+      console.log(tokenURI);
+
       const characterKey =
         Object.keys(charactersData).find(
           (key) => charactersData[key].ipfsHash === imgHash
@@ -66,6 +69,22 @@ const GameLogin: React.FC<GameLoginProps> = ({
 
       window.localStorage.setItem("loginInfor", JSON.stringify(loginInfor));
 
+      writeUserData({
+        accountInfor: {
+          tokenId: Number(tokenId),
+          username: tokenURI.userName,
+          accountAddr: "",
+          ownerAddr: "",
+        },
+        gameInfor: {
+          direction: "down",
+          position: {
+            x: 100,
+            y: 300,
+          },
+        },
+      });
+
       message.success("Login Success");
 
       const component = document.querySelector<HTMLDivElement>(
@@ -77,6 +96,7 @@ const GameLogin: React.FC<GameLoginProps> = ({
 
       setIsLogin(true);
     } catch (error) {
+      console.log(error);
       message.error("Login error!");
     }
   };
@@ -94,7 +114,7 @@ const GameLogin: React.FC<GameLoginProps> = ({
   return (
     <div
       id="GameLoginComponent"
-      className="absolute top-[20%] left-[10%] text-black bg-white bg-opacity-90 border-2 border-black"
+      className="absolute top-[20%] left-[10%] text-black bg-white bg-opacity-90 border-2 border-black z-10"
     >
       <div className="p-6">
         <h2 className="font-semibold text-xl">Welcome to Ether Echelon</h2>

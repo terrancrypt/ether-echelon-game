@@ -1,0 +1,13 @@
+{
+  "name": "Blue Butterfly",
+  "image": "https://ipfs.io/ipfs/Qmc6Sfk5GrgfsSmpKdai7qmrX9ZpBBkXWow4Eq96mYC8Dj",
+  "attributes": {
+    "evolutionable": false,
+    "rarity": "Rare",
+    "type": "Water",
+    "hp": 480,
+    "attack": 30,
+    "defend": 10,
+    "skills": ["Cut", "Water Blast"]
+  }
+}

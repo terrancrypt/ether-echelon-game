@@ -1,0 +1,13 @@
+{
+  "name": "Yellow Bamboo",
+  "image": "https://ipfs.io/ipfs/QmT24HQkhWYqx9hn3y7Ktu9MJCkZodiJGRdNqCbL46ttmU",
+  "attributes": {
+    "evolutionable": false,
+    "rarity": "Rare",
+    "type": "Earth",
+    "hp": 480,
+    "attack": 20,
+    "defend": 20,
+    "skills": ["Cut", "Stone Crushed"]
+  }
+}

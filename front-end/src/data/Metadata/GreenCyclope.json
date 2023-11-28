@@ -1,0 +1,17 @@
+{
+  "name": "Green Cyclope",
+  "image": "https://ipfs.io/ipfs/QmaC94k5Cs2rpdggSTHaZWm2ovCDAi7Wevy9aA4WAwf4SX",
+  "attributes": {
+    "evolutionable": true,
+    "evolutionStatus": {
+      "toName": "DemonCyclopeGreen",
+      "toTokenId": "001009"
+    },
+    "rarity": "Normal",
+    "type": "Grass",
+    "hp": 480,
+    "attack": 20,
+    "defend": 10,
+    "skills": ["Slash Double", "Grass Cut"]
+  }
+}
