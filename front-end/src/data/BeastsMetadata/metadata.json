@@ -1,0 +1,63 @@
+{
+  "Beasts": {
+    "001000": "Axolot",
+    "001001": "AxolotBlue",
+    "001002": "Bamboo",
+    "001003": "BambooYellow",
+    "001004": "Butterfly",
+    "001005": "ButterflyBlue",
+    "001006": "Cyclope",
+    "001007": "DemonCyclope",
+    "001008": "CyclopeGreen",
+    "001009": "DemonCyclopeGreen",
+    "001010": "TinyDragon",
+    "001011": "TinyDragonYellow",
+    "001012": "GhostEye",
+    "001013": "GhostEyeRed",
+    "001014": "Flam",
+    "001015": "GiantFlam",
+    "001016": "GoldRacoon",
+    "001017": "GiantGoldRacoon",
+    "001018": "RedRacoon",
+    "001019": "GiantRedRacoon",
+    "001020": "LarvaGrass",
+    "001021": "LarvaIce",
+    "001022": "LizardGrass",
+    "001023": "LizardEarth",
+    "001024": "Mole",
+    "001025": "MoleIce",
+    "001026": "Mollusc",
+    "001027": "MolluscGrass",
+    "001028": "ThunderOwl",
+    "001029": "DemonOwl",
+    "001030": "IceSlime",
+    "001031": "SuperIceSlime",
+    "001032": "GrassSlime",
+    "001033": "SuperGrassSlime",
+    "001034": "TinyFireSnake",
+    "001035": "FireSnake",
+    "001036": "TinyGrassSnake",
+    "001037": "GrassSnake",
+    "001038": "Spirit",
+    "001039": "GiantSpirit",
+    "001040": "GreenFrog",
+    "001041": "GiantGreenGrog"
+  },
+  "Chests": {
+    "002000": "NormalChest",
+    "002001": "RareChest",
+    "002002": "EpicChest"
+  },
+  "EvolutionaryStones": {
+    "003000": "FireStone",
+    "003001": "GrassStone",
+    "003002": "ThunderStone",
+    "003003": "IceStone",
+    "003004": "SpiritStone"
+  },
+  "Egg": {
+    "004000": "FrogEgg",
+    "004001": "SnakeEgg",
+    "004002": "OwlEgg"
+  }
+}

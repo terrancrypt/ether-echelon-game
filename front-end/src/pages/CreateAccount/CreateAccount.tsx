@@ -167,7 +167,7 @@ const CreateAccountPage: React.FC = () => {
         <div>
           <div className="mt-8 flex items-start justify-between gap-4">
             <div className="flex-[0.7] bg-[white] rounded-lg p-6">
-              <div className="text-2xl font-bold text-black mb-5 w-[500px] flex items-center gap-2">
+              <div className="text-sm font-bold text-black mb-5 w-[500px] flex items-center gap-2">
                 <h1>Create Your New Account</h1>
                 <Tooltip
                   title="By creating an NFT (ERC721) and storing it in your personal wallet, you can use this NFT account to log into Ether Echelon games. Each NFT Account has its own wallet address to store in-game items and currency. If you transfer this NFT to another personal wallet address, any items in the NFT Account will move with it."
@@ -190,6 +190,7 @@ const CreateAccountPage: React.FC = () => {
                 layout="vertical"
                 onFinish={onFinish}
                 style={{ maxWidth: 600 }}
+                className="text-xs"
               >
                 <span>Username</span>
                 <Form.Item name="username" rules={[{ required: true }]}>
@@ -250,9 +251,9 @@ const CreateAccountPage: React.FC = () => {
             </div>
           </div>
           {accountCreated?.length != 0 && accountCreated != null ? (
-            <div className="mt-6 p-4 bg-white bg-opacity-80 text-black mb-10">
+            <div className="mt-6 p-4 bg-white bg-opacity-80 text-black mb-10 text-sm">
               The accounts you have created:
-              <table className="w-full mt-4 text-left">
+              <table className="w-full mt-4 text-left text-[10px]">
                 <thead className="border-b border-b-black mb-2">
                   <tr>
                     <th>Username</th>
@@ -262,16 +263,16 @@ const CreateAccountPage: React.FC = () => {
                 </thead>
                 <tbody>
                   {accountCreated?.map((account) => (
-                    <tr className="text-sm">
+                    <tr className="text-[10px]">
                       <td className="py-4">{account.username}</td>
                       <td className="py-4">{account.character}</td>
                       <td className="py-4">{account.tokenId}</td>
-                      <td className="max-w-[100px] ">
+                      <td className="max-w-[100px] text-[10px]">
                         <button
                           onClick={() => {
                             addTokenToWallet(account.tokenId);
                           }}
-                          className="px-2 py-1 border-2 border-black hover:bg-black hover:text-white transition-all text-sm"
+                          className="px-2 py-1 border-2 border-black hover:bg-black hover:text-white transition-all"
                         >
                           Add to wallet
                         </button>
@@ -279,7 +280,7 @@ const CreateAccountPage: React.FC = () => {
                           onClick={() => {
                             onRemoveToken(account.tokenId);
                           }}
-                          className="px-2 py-1 border-2 border-black hover:bg-red-400 hover:text-white transition-all text-sm"
+                          className="px-2 py-1 border-2 border-black hover:bg-red-400 hover:text-white transition-all"
                         >
                           Remove
                         </button>

@@ -46,27 +46,8 @@ contract AccountNftTest is Test {
         vm.stopPrank();
 
         uint256 balanceOfUser = token.balanceOf(user);
-        string memory tokenUri = token.tokenURI(0);
-        string memory tokenName = token.name();
-        string memory expectedTokenUri = string(
-            abi.encodePacked(
-                "data:application/json;base64,",
-                Base64.encode(
-                    abi.encodePacked(
-                        '{"name": "',
-                        tokenName,
-                        '", "image": "https://ipfs.io/ipfs/',
-                        IPFS_HASH,
-                        '", "userName": "',
-                        USER_NAME,
-                        '"}'
-                    )
-                )
-            )
-        );
 
         assertEq(balanceOfUser, 1);
-        assertEq(tokenUri, expectedTokenUri);
         assertEq(tokenId, 0);
     }
 

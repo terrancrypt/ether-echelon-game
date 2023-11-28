@@ -91,7 +91,7 @@ const GamePage = () => {
   }, [isLogin]);
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="game-container flex items-center justify-center">
       <div ref={logInComponentRef} className="inline-block relative scale-90">
         <GameLogin setIsLogin={setIsLogin} setPlayerInfor={setPlayerInfor} />
         <canvas

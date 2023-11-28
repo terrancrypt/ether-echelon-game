@@ -2,13 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono&display=swap');
 
 body {
   color: white;
   background-color: black;
   scrollbar-color: #4a5568 #2d3748;
   scrollbar-width: thin;
+  font-family: "Press Start 2P", monospace;
 }
 
 body::-webkit-scrollbar {
@@ -27,6 +27,11 @@ body::-webkit-scrollbar-track {
 .container {
   margin: auto;
   padding: 0 40px 0 40px;
+}
+
+
+.game-container {
+  font-family: 'Pixelify Sans', sans-serif !important;
 }
 
 .button-connect {
@@ -56,6 +61,27 @@ body::-webkit-scrollbar-track {
 .ant-form,
 .ant-input,
 .ant-select,
-.ant-select-single {
-  font-family: 'Space Mono', monospace !important;
+.ant-select-single,
+.ant-select-selection-placeholder,
+.ant-form-item-control-input-content {
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+}
+
+
+/* Game UI Modal */
+.game-modal {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-200px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -4,6 +4,7 @@ pragma solidity 0.8.21;
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 contract AccountNFT is ERC721, Ownable {
     error AccountNFT_ExceededLength();
@@ -18,6 +19,7 @@ contract AccountNFT is ERC721, Ownable {
     }
     mapping(uint256 tokenId => AccountInfor) private s_tokenInfo;
     uint256 private s_tokenCounter;
+    mapping(uint256 tokenId => address accountAddr) public s_tokenIdToAddr;
 
     mapping(string ipfsImageHash => bool isExists) private s_isImageHash;
     mapping(uint256 imageHashId => string ipfsImageHash)
@@ -68,6 +70,10 @@ contract AccountNFT is ERC721, Ownable {
     ) public view override returns (string memory) {
         string memory username = s_tokenInfo[tokenId].username;
         string memory ipfsImageHash = s_tokenInfo[tokenId].ipfsImageHash;
+        string memory accountAddr = Strings.toHexString(
+            uint256(uint160(s_tokenIdToAddr[tokenId])),
+            20
+        );
 
         return
             string(
@@ -81,6 +87,8 @@ contract AccountNFT is ERC721, Ownable {
                             ipfsImageHash,
                             '", "userName": "',
                             username,
+                            '", "accountAddr": "',
+                            accountAddr,
                             '"}'
                         )
                     )
@@ -116,6 +124,13 @@ contract AccountNFT is ERC721, Ownable {
         s_ipfsImageHash[s_currentImageHash] = _ipfsImageHash;
         s_isImageHash[_ipfsImageHash] = true;
         s_currentImageHash++;
+    }
+
+    function updateAddrForAccount(
+        uint256 _tokenId,
+        address _accountAddr
+    ) external onlyOwner {
+        s_tokenIdToAddr[_tokenId] = _accountAddr;
     }
 
     // ========== Getter Functions =========

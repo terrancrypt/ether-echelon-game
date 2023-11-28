@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import EELogo from "/images/EELogo.png";
+import { useState } from "react";
+import EELogo from "/EtherEchelon_Logo.png";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useAccount } from "wagmi";
 import { Modal } from "antd";
@@ -26,10 +26,10 @@ const Header = () => {
       <header
         className={"container flex items-center justify-between border-b "}
       >
-        <NavLink className="flex items-center justify-center py-6" to={"/"}>
+        <NavLink className="flex items-center justify-center py-2" to={"/"}>
           <img src={EELogo} height={80} width={80} alt="" />
         </NavLink>
-        <nav className="flex items-center justify-between gap-8 font-bold text-base uppercase">
+        <nav className="flex items-center justify-between gap-8 font-bold text-xs uppercase">
           <NavLink to="/play">play</NavLink>
           <NavLink to="/create-account">create account</NavLink>
         </nav>
@@ -43,7 +43,7 @@ const Header = () => {
             </button>
           ) : (
             <button
-              className="button-connect font-bold text-base uppercase border isolate px-[40px] py-3 relative hover:text-black"
+              className="button-connect font-bold text-xs uppercase border isolate px-[40px] py-3 relative hover:text-black"
               onClick={showModal}
             >
               <span>{shortenAddr(address)}</span>

@@ -1,122 +1,178 @@
-// // SPDX-License-Identifier: MIT
-// pragma solidity 0.8.21;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.21;
 
-// import {Test, console} from "forge-std/Test.sol";
-// import "src/erc6551/ERC6551Account.sol";
-// import "src/erc6551/ERC6551Registry.sol";
-// import "src/interfaces/IERC6551Registry.sol";
-// import "src/interfaces/IERC6551Account.sol";
-// import "src/nft/AccountNFT.sol";
-// import "src/nft/GameAssetsNFT.sol";
-// import "src/EEEngine.sol";
+import {Test, console} from "forge-std/Test.sol";
+import "src/erc6551/ERC6551Account.sol";
+import "src/erc6551/ERC6551Registry.sol";
+import "src/interfaces/IERC6551Registry.sol";
+import "src/interfaces/IERC6551Account.sol";
+import "src/nft/AccountNFT.sol";
+import "src/nft/GameAssetsNFT.sol";
+import "src/EEEngine.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
-// contract EEEngineTest is Test {
-//     ERC6551Account implementation;
-//     ERC6551Registry registry;
-//     AccountNFT accountNft;
-//     GameAssetsNFT beastsNft;
-//     GameAssetsNFT chestsNft;
-//     GameAssetsNFT eeCoinNft;
-//     EEEngine engine;
+contract EEEngineTest is Test {
+    ERC6551Account implementation;
+    ERC6551Registry registry;
+    AccountNFT accountNft;
+    GameAssetsNFT beastsNft;
+    GameAssetsNFT chestsNft;
+    GameAssetsNFT eeCoinNft;
+    EEEngine engine;
 
-//     address owner = makeAddr("owner");
-//     address user1 = makeAddr("user1");
+    address owner = makeAddr("owner");
+    address user1 = makeAddr("user1");
 
-//     uint256 constant USER1_ACC_NFT_MINTED_ID = 0;
+    string constant USER_NAME = "ExampleUsername";
+    uint256 constant TOKEN_ACCOUNT_ID_1 = 0;
+    string constant IPFS_HASH =
+        "QmcRHkTHX7zAJq9aKrLBrEvWyDeuUxyvXsQ6YaEfyZ2TRA";
 
-//     string constant IPFS_HASH =
-//         "QmcRHkTHX7zAJq9aKrLBrEvWyDeuUxyvXsQ6YaEfyZ2TRA";
+    function setUp() external {
+        accountNft = new AccountNFT(owner);
+        implementation = new ERC6551Account();
+        registry = new ERC6551Registry(owner, accountNft, implementation);
+        beastsNft = new GameAssetsNFT(owner, IPFS_HASH);
+        chestsNft = new GameAssetsNFT(owner, IPFS_HASH);
+        eeCoinNft = new GameAssetsNFT(owner, IPFS_HASH);
+        engine = new EEEngine(
+            owner,
+            address(registry),
+            address(accountNft),
+            address(beastsNft),
+            address(eeCoinNft),
+            address(chestsNft)
+        );
+        vm.startPrank(owner);
+        accountNft.transferOwnership(address(engine));
+        registry.transferOwnership(address(engine));
+        beastsNft.transferOwnership(address(engine));
+        chestsNft.transferOwnership(address(engine));
+        eeCoinNft.transferOwnership(address(engine));
+        vm.stopPrank();
+    }
 
-//     function setUp() external {
-//         accountNft = new AccountNFT(owner);
-//         implementation = new ERC6551Account();
-//         registry = new ERC6551Registry(owner, accountNft, implementation);
-//         beastsNft = new GameAssetsNFT(owner, IPFS_HASH);
-//         chestsNft = new GameAssetsNFT(owner, IPFS_HASH);
-//         eeCoinNft = new GameAssetsNFT(owner, IPFS_HASH);
-//         engine = new EEEngine(
-//             owner,
-//             address(registry),
-//             address(accountNft),
-//             address(beastsNft),
-//             address(eeCoinNft),
-//             address(chestsNft)
-//         );
-//         vm.startPrank(owner);
-//         accountNft.transferOwnership(address(engine));
-//         registry.transferOwnership(address(engine));
-//         beastsNft.transferOwnership(address(engine));
-//         chestsNft.transferOwnership(address(engine));
-//         eeCoinNft.transferOwnership(address(engine));
-//         vm.stopPrank();
-//     }
+    modifier ownerAddIpfsHash() {
+        vm.prank(owner);
+        engine.addIpfsImageHash(IPFS_HASH);
+        _;
+    }
 
-//     function test_canMintAccountNft() public {
-//         vm.prank(user1);
-//         uint256 actualId = engine.mintAccountNft();
+    // ========== Test Owner Functions =========
+    function test_canAddIpfsHash() public ownerAddIpfsHash {
+        string memory ipfsHash = accountNft.getIpfsImageHashById(
+            TOKEN_ACCOUNT_ID_1
+        );
 
-//         address expectedUser = accountNft.ownerOf(actualId);
-//         assertEq(user1, expectedUser);
-//         assertEq(actualId, USER1_ACC_NFT_MINTED_ID);
-//     }
+        assertEq(ipfsHash, IPFS_HASH);
+    }
 
-//     function test_canCreateAccountByNft() public {
-//         _userAccountNftMinted();
-//         vm.prank(user1);
-//         address payable actualAddr = engine.createAccountByNft(
-//             USER1_ACC_NFT_MINTED_ID,
-//             1,
-//             ""
-//         );
-//         address expectedAddr = registry.account(
-//             address(implementation),
-//             block.chainid,
-//             address(accountNft),
-//             USER1_ACC_NFT_MINTED_ID,
-//             1
-//         );
-//         (, address tokenContract, uint256 tokenId) = IERC6551Account(actualAddr)
-//             .token();
-//         address expectedOwner = IERC6551Account(actualAddr).owner();
+    // ========== Test Create Account ==========
+    function test_canCreateAccountInEngine() public ownerAddIpfsHash {
+        address expectedAccountAddr = registry.account(
+            address(implementation),
+            block.chainid,
+            address(accountNft),
+            TOKEN_ACCOUNT_ID_1,
+            1
+        );
 
-//         assertEq(actualAddr, expectedAddr);
-//         assertEq(tokenContract, address(accountNft));
-//         assertEq(USER1_ACC_NFT_MINTED_ID, tokenId);
-//         assertEq(user1, expectedOwner);
-//     }
+        AccountNFT.AccountInfor memory accInfo = AccountNFT.AccountInfor({
+            username: USER_NAME,
+            ipfsImageHash: IPFS_HASH
+        });
 
-//     // function test_canMintGameAssetsNftToAccountAddress() public {
-//     //     _userAccountNftMinted();
+        vm.prank(user1);
+        address actualAccountAddr = engine.createAccount(accInfo);
 
-//     //     uint256 tokenId = 0;
-//     //     uint256 amountMint = 10;
-//     //     address payable accountAddr = _userAccountCreated();
-//     //     vm.prank(user1);
-//     //     engine.mintGameAssetsNft(
-//     //         accountAddr,
-//     //         address(beastsNft),
-//     //         tokenId,
-//     //         amountMint,
-//     //         ""
-//     //     );
+        string memory tokenName = accountNft.name();
+        string memory actualAccountAddrToString = Strings.toHexString(
+            uint256(uint160(actualAccountAddr)),
+            20
+        );
 
-//     //     uint256 actualBalance = beastsNft.balanceOf(accountAddr, tokenId);
+        string memory expectedTokenUri = string(
+            abi.encodePacked(
+                "data:application/json;base64,",
+                Base64.encode(
+                    abi.encodePacked(
+                        '{"name": "',
+                        tokenName,
+                        '", "image": "https://ipfs.io/ipfs/',
+                        IPFS_HASH,
+                        '", "userName": "',
+                        USER_NAME,
+                        '", "accountAddr": "',
+                        actualAccountAddrToString,
+                        '"}'
+                    )
+                )
+            )
+        );
 
-//     //     assertEq(amountMint, actualBalance);
-//     // }
+        string memory actualTokenUri = accountNft.tokenURI(TOKEN_ACCOUNT_ID_1);
 
-//     function _userAccountNftMinted() internal {
-//         vm.prank(user1);
-//         engine.mintAccountNft();
-//     }
+        assertEq(expectedAccountAddr, actualAccountAddr);
+        assertEq(expectedTokenUri, actualTokenUri);
+    }
 
-//     function _userAccountCreated() internal returns (address payable) {
-//         vm.prank(user1);
-//         address accountAddr = engine.createAccountByNft(
-//             USER1_ACC_NFT_MINTED_ID,
-//             block.number,
-//             ""
-//         );
-//         return payable(accountAddr);
-//     }
-// }
+    // function test_canCreateAccountByNft() public {
+    //     _userAccountNftMinted();
+    //     vm.prank(user1);
+    //     address payable actualAddr = engine.createAccountByNft(
+    //         USER1_ACC_NFT_MINTED_ID,
+    //         1,
+    //         ""
+    //     );
+    //     address expectedAddr = registry.account(
+    //         address(implementation),
+    //         block.chainid,
+    //         address(accountNft),
+    //         USER1_ACC_NFT_MINTED_ID,
+    //         1
+    //     );
+    //     (, address tokenContract, uint256 tokenId) = IERC6551Account(actualAddr)
+    //         .token();
+    //     address expectedOwner = IERC6551Account(actualAddr).owner();
+
+    //     assertEq(actualAddr, expectedAddr);
+    //     assertEq(tokenContract, address(accountNft));
+    //     assertEq(USER1_ACC_NFT_MINTED_ID, tokenId);
+    //     assertEq(user1, expectedOwner);
+    // }
+
+    // function test_canMintGameAssetsNftToAccountAddress() public {
+    //     _userAccountNftMinted();
+
+    //     uint256 tokenId = 0;
+    //     uint256 amountMint = 10;
+    //     address payable accountAddr = _userAccountCreated();
+    //     vm.prank(user1);
+    //     engine.mintGameAssetsNft(
+    //         accountAddr,
+    //         address(beastsNft),
+    //         tokenId,
+    //         amountMint,
+    //         ""
+    //     );
+
+    //     uint256 actualBalance = beastsNft.balanceOf(accountAddr, tokenId);
+
+    //     assertEq(amountMint, actualBalance);
+    // }
+
+    // function _userAccountNftMinted() internal {
+    //     vm.prank(user1);
+    //     engine.mintAccountNft();
+    // }
+
+    // function _userAccountCreated() internal returns (address payable) {
+    //     vm.prank(user1);
+    //     address accountAddr = engine.createAccountByNft(
+    //         USER1_ACC_NFT_MINTED_ID,
+    //         block.number,
+    //         ""
+    //     );
+    //     return payable(accountAddr);
+    // }
+}
