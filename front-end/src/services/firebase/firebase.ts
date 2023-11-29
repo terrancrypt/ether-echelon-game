@@ -2,16 +2,12 @@ import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged, signInAnonymously } from "firebase/auth";
 import {
   DatabaseReference,
-  child,
-  get,
   getDatabase,
   onDisconnect,
-  onValue,
   ref,
   set,
 } from "firebase/database";
 import { UserDataType } from "./UserDataType";
-import initGame from "../../pages/GamePage/game-logic/initGame";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDjJSw7Itcf21WeBk8BrCXybzvicmd5H3E",
@@ -25,53 +21,51 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getDatabase(app);
 let playerRef: DatabaseReference;
 let playerId: string;
 
-export function initFireBase() {
-  const auth = getAuth(app);
+function initFireBase() {
   signInAnonymously(auth)
-    .then(() => {
-      console.log("Login Success!");
-    })
+    .then(() => {})
     .catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
       console.log("Error code: ", errorCode);
       console.log("Error message: ", errorMessage);
     });
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      playerId = user.uid;
-
-      playerRef = ref(db, `players/${playerId}`);
-
-      onDisconnect(playerRef).remove();
-
-      readUserData();
-    } else {
-      console.log("You logout");
-    }
-  });
 }
 
-export function writeUserData(userData: UserDataType) {
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log("You are logged in!");
+    playerId = user.uid;
+    playerRef = ref(db, `players/${playerId}`);
+    onDisconnect(playerRef).remove();
+  } else {
+    console.log("You logout");
+  }
+});
+
+function writeUserData({ accountInfor, gameInfor }: UserDataType) {
   set(playerRef, {
-    tokenId: userData.accountInfor.tokenId,
-    username: userData.accountInfor.username,
-    address: userData.accountInfor.accountAddr,
-    character: userData.accountInfor.ownerAddr,
-    direction: userData.gameInfor.direction,
-    position: {
-      x: userData.gameInfor.position.x,
-      y: userData.gameInfor.position.y,
+    accountInfor: {
+      playerId: playerId,
+      tokenId: accountInfor.tokenId,
+      username: accountInfor.username,
+      accountAddr: accountInfor.accountAddr,
+      ownerAddr: accountInfor.ownerAddr,
+    },
+    gameInfor: {
+      character: gameInfor.character,
+      direction: gameInfor.direction,
+      position: {
+        x: gameInfor.position.x,
+        y: gameInfor.position.y,
+      },
     },
   });
 }
 
-export function readUserData() {
-  const allPlayerRef = ref(db, "players");
-  console.log(allPlayerRef);
-}
+export { db, initFireBase, writeUserData };
