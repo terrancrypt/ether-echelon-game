@@ -83,7 +83,7 @@ class Sprite {
     this.currentAnimation = config.currentAnimation || "idle-down";
     this.currentAnimationFrame = 0;
 
-    this.animationFrameLimit = config.animationFrameLimit || 8;
+    this.animationFrameLimit = config.animationFrameLimit || 6;
     this.animationFrameProgress = this.animationFrameLimit;
 
     // Reference the game object

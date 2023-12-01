@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import Overworld, { OverworldMapsData } from "./class/Overworld";
-import { withGrid } from "./utils/utils";
+import { asGridCoord, withGrid } from "./utils/utils";
 import Person from "./class/Person";
 
 const GameOnline = () => {
@@ -16,11 +16,33 @@ const GameOnline = () => {
             isPlayerControlled: true,
             src: "images/Characters/AdventureGirl/AdventurerGirlSpriteSheet.png",
           }),
-          npc1: new Person({
-            x: withGrid(9),
+          npcA: new Person({
+            x: withGrid(7),
             y: withGrid(10),
             src: "images/Characters/LumberJack/LumberJackSpriteSheet.png",
+            behaviorLoop: [
+              { type: "stand", direction: "left", time: 800 },
+              { type: "stand", direction: "up", time: 800 },
+              { type: "stand", direction: "right", time: 1200 },
+              { type: "stand", direction: "up", time: 800 },
+            ],
           }),
+          npcB: new Person({
+            x: withGrid(9),
+            y: withGrid(10),
+            src: "images/Characters/Nurse/NurseSpriteSheet.png",
+            behaviorLoop: [
+              { type: "walk", direction: "left" },
+              { type: "stand", direction: "up", time: 800 },
+              { type: "walk", direction: "up" },
+              { type: "walk", direction: "right" },
+              { type: "walk", direction: "down" },
+            ],
+          }),
+        },
+        walls: {
+          [asGridCoord(6, 7)]: true,
+          [asGridCoord(7, 7)]: true,
         },
       },
     };

@@ -1,4 +1,14 @@
 import GameObject, { GameObjectConfig } from "./GameObject";
+import OverworldMap from "./OverworldMap";
+
+interface StateUpdate {
+  arrow: string | undefined;
+  map: OverworldMap | null;
+}
+
+interface PersonConfig extends GameObjectConfig {
+  isPlayerControlled?: boolean;
+}
 
 class Person extends GameObject {
   private movingProgressRemaining: number;
@@ -7,7 +17,7 @@ class Person extends GameObject {
   };
   [key: string]: any;
 
-  constructor(config: GameObjectConfig & { isPlayerControlled?: boolean }) {
+  constructor(config: PersonConfig) {
     super(config);
     this.movingProgressRemaining = 0;
 
@@ -21,41 +31,53 @@ class Person extends GameObject {
     };
   }
 
-  update(state?: { arrow: string | undefined }): void {
-    this.updatePosition();
-    this.updateSprite(state);
-
-    if (
-      this.isPlayerControlled &&
-      this.movingProgressRemaining === 0 &&
-      state?.arrow
-    ) {
-      this.direction = state.arrow;
-      this.movingProgressRemaining = 16;
-    }
-  }
-
-  updatePosition() {
+  update(state?: StateUpdate): void {
     if (this.movingProgressRemaining > 0) {
-      const [property, change] = this.directionUpdate[this.direction];
-      this[property] += change;
-      this.movingProgressRemaining -= 1;
+      this.updatePosition();
+    } else {
+      if (this.isPlayerControlled && state?.arrow) {
+        // More cases for starting to walk
+
+        this.startBehavior({
+          type: "walk",
+          direction: state.arrow,
+          map: state.map,
+          arrow: state.arrow,
+        });
+      }
+      this.updateSprite();
     }
   }
 
-  updateSprite(state?: { arrow: string | undefined }) {
-    if (
-      this.isPlayerControlled &&
-      this.movingProgressRemaining === 0 &&
-      !state?.arrow
-    ) {
-      this.sprite.setAnimation("idle-" + this.direction);
+  startBehavior(
+    state: StateUpdate & {
+      type: string;
+      direction: string;
+    }
+  ) {
+    this.direction = state.direction;
+    if (state.map?.isSpaceTaken(this.x, this.y, this.direction)) {
+      // Stop here if space is taken
       return;
     }
 
+    // Ready to walk
+    state.map?.moveWall(this.x, this.y, this.direction);
+    this.movingProgressRemaining = 16;
+  }
+
+  updatePosition() {
+    const [property, change] = this.directionUpdate[this.direction];
+    this[property] += change;
+    this.movingProgressRemaining -= 1;
+  }
+
+  updateSprite() {
     if (this.movingProgressRemaining > 0) {
       this.sprite.setAnimation("walk-" + this.direction);
+      return;
     }
+    this.sprite.setAnimation("idle-" + this.direction);
   }
 }
 
