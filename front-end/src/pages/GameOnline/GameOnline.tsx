@@ -5,6 +5,7 @@ import Person from "./class/Person";
 import "./gameStyle.css";
 import professorHourseCollisions from "../../assets/maps/ProfessorHouse/collisionsData";
 import collisionsTownData from "../../assets/maps/Town/collisionsData";
+import collisionsTown2Data from "../../assets/maps/Town2/conlisionsData";
 
 const GameOnline = () => {
   useEffect(() => {
@@ -66,6 +67,19 @@ const GameOnline = () => {
           }),
         },
         walls: getCollisionsData(collisionsTownData, 31, 42),
+      },
+      Town2: {
+        lowerSrc: "src/assets/maps/Town2/Town2.png",
+        upperSrc: "src/assets/maps/Town2/UpperTown2.png",
+        gameObjects: {
+          player: new Person({
+            x: withGrid(25),
+            y: withGrid(18),
+            isPlayerControlled: true,
+            src: "images/Characters/AdventureGirl/AdventurerGirlSpriteSheet.png",
+          }),
+        },
+        walls: getCollisionsData(collisionsTown2Data, 52, 2402),
       },
     };
 

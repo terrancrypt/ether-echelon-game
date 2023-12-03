@@ -75,7 +75,7 @@ class Overworld {
   }
 
   init(initData: OverworldMapsData) {
-    this.map = new OverworldMap(initData.Town);
+    this.map = new OverworldMap(initData.Town2);
     this.map.mountObjects();
 
     this.bindActionInput();
