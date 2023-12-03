@@ -22,4 +22,53 @@ function nextPosition(initialX: number, initialY: number, direction: string) {
   return { x, y };
 }
 
-export { withGrid, asGridCoord, nextPosition };
+function emitEvent(eventName: string, personId: string | null) {
+  if (personId) {
+    const event = new CustomEvent(eventName, {
+      detail: {
+        whoId: personId,
+      },
+    });
+    document.dispatchEvent(event);
+  }
+}
+
+function oppositeDirection(direction: string): string | undefined {
+  if (direction === "left") return "right";
+  if (direction === "right") return "left";
+  if (direction === "up") return "down";
+  if (direction === "down") return "up";
+}
+
+function getCollisionsData(
+  mapData: number[],
+  widthTiles: number,
+  symbolNumber: number
+) {
+  const collisionMap = [];
+  for (let i = 0; i < mapData.length; i += widthTiles) {
+    collisionMap.push(mapData.slice(i, widthTiles + i));
+  }
+  console.log(collisionMap);
+
+  const walls: any = {};
+  collisionMap.forEach((row, y) => {
+    row.forEach((symbol, x) => {
+      if (symbol === symbolNumber) {
+        console.log(x, y);
+        walls[asGridCoord(x, y)] = true;
+      }
+    });
+  });
+  // console.log(walls);
+  return walls;
+}
+
+export {
+  withGrid,
+  asGridCoord,
+  nextPosition,
+  emitEvent,
+  oppositeDirection,
+  getCollisionsData,
+};

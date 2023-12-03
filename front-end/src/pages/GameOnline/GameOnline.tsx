@@ -1,14 +1,17 @@
 import { useEffect } from "react";
 import Overworld, { OverworldMapsData } from "./class/Overworld";
-import { asGridCoord, withGrid } from "./utils/utils";
+import { asGridCoord, getCollisionsData, withGrid } from "./utils/utils";
 import Person from "./class/Person";
+import "./gameStyle.css";
+import professorHourseCollisions from "../../assets/maps/ProfessorHouse/collisionsData";
+import collisionsTownData from "../../assets/maps/Town/collisionsData";
 
 const GameOnline = () => {
   useEffect(() => {
     const initData: OverworldMapsData = {
-      DemoMap: {
-        lowerSrc: "src/assets/DemoMap.png",
-        upperSrc: "src/assets/UpperDemoMap.png",
+      ProfessorHouse: {
+        lowerSrc: "src/assets/maps/ProfessorHouse/ProfessorHouse.png",
+        upperSrc: "src/assets/maps/ProfessorHouse/UpperProfessorHouse.png",
         gameObjects: {
           player: new Person({
             x: withGrid(6),
@@ -17,33 +20,52 @@ const GameOnline = () => {
             src: "images/Characters/AdventureGirl/AdventurerGirlSpriteSheet.png",
           }),
           npcA: new Person({
-            x: withGrid(7),
-            y: withGrid(10),
+            x: withGrid(2),
+            y: withGrid(12),
             src: "images/Characters/LumberJack/LumberJackSpriteSheet.png",
             behaviorLoop: [
-              { type: "stand", direction: "left", time: 800 },
-              { type: "stand", direction: "up", time: 800 },
-              { type: "stand", direction: "right", time: 1200 },
-              { type: "stand", direction: "up", time: 800 },
-            ],
-          }),
-          npcB: new Person({
-            x: withGrid(9),
-            y: withGrid(10),
-            src: "images/Characters/Nurse/NurseSpriteSheet.png",
-            behaviorLoop: [
-              { type: "walk", direction: "left" },
-              { type: "stand", direction: "up", time: 800 },
+              { type: "stand", direction: "down", time: 10000 },
               { type: "walk", direction: "up" },
-              { type: "walk", direction: "right" },
+              { type: "stand", direction: "right", time: 800 },
               { type: "walk", direction: "down" },
             ],
+            talking: [
+              {
+                events: [
+                  {
+                    type: "textMessage",
+                    text: "I'm busy...",
+                    faceHero: "npcA",
+                  },
+                  { type: "textMessage", text: "Go away!" },
+                ],
+              },
+            ],
+          }),
+          professorNPC: new Person({
+            x: withGrid(10),
+            y: withGrid(5),
+            src: "images/Characters/Professor/ProfessorSpriteSheet.png",
+            behaviorLoop: [
+              { type: "stand", direction: "left", time: 2000 },
+              { type: "stand", direction: "down", time: 2000 },
+            ],
           }),
         },
-        walls: {
-          [asGridCoord(6, 7)]: true,
-          [asGridCoord(7, 7)]: true,
+        walls: getCollisionsData(professorHourseCollisions, 16, 122),
+      },
+      Town: {
+        lowerSrc: "src/assets/maps/Town/Town.png",
+        upperSrc: "src/assets/maps/Town/UpperTown.png",
+        gameObjects: {
+          player: new Person({
+            x: withGrid(18),
+            y: withGrid(14),
+            isPlayerControlled: true,
+            src: "images/Characters/AdventureGirl/AdventurerGirlSpriteSheet.png",
+          }),
         },
+        walls: getCollisionsData(collisionsTownData, 31, 42),
       },
     };
 

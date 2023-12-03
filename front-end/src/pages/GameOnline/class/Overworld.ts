@@ -1,4 +1,5 @@
 import DirectionInput from "./DirectionInput";
+import KeyPressListener from "./KeyPressListener";
 import OverworldMap, { OverworldMapConfig } from "./OverworldMap";
 
 interface OverworldConfig {
@@ -47,9 +48,13 @@ class Overworld {
         this.map.drawLowerImage(this.ctx, cameraPerson);
 
         // Draw Game Objects
-        Object.values(this.map?.gameObjects).forEach((object) => {
-          object.sprite.draw(this.ctx, cameraPerson);
-        });
+        Object.values(this.map?.gameObjects)
+          .sort((a, b) => {
+            return a.y - b.y; // with this function, we want to draw in order
+          })
+          .forEach((object) => {
+            object.sprite.draw(this.ctx, cameraPerson);
+          });
 
         // Draw upper layer
         this.map.drawUpperImage(this.ctx, cameraPerson);
@@ -62,14 +67,30 @@ class Overworld {
     step();
   }
 
+  bindActionInput() {
+    new KeyPressListener("Enter", () => {
+      // Is there a person here to talk to?
+      this.map?.checkForActionCutscene();
+    });
+  }
+
   init(initData: OverworldMapsData) {
-    this.map = new OverworldMap(initData.DemoMap);
+    this.map = new OverworldMap(initData.Town);
     this.map.mountObjects();
+
+    this.bindActionInput();
 
     this.directionInput = new DirectionInput();
     this.directionInput.init();
 
     this.startGameLoop();
+
+    // this.map.startCutscene([
+    //   { who: "npcA", type: "walk", direction: "up" },
+    //   { who: "npcA", type: "stand", direction: "left", time: 800 },
+    //   { who: "player", type: "stand", direction: "right", time: 800 },
+    //   { who: "npcA", type: "textMessage", text: "WHY HELLO THERE!" },
+    // ]);
   }
 }
 
