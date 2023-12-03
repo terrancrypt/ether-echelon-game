@@ -74,11 +74,26 @@ class Overworld {
     });
   }
 
-  init(initData: OverworldMapsData) {
-    this.map = new OverworldMap(initData.Town2);
+  bindHeroPositionCheck() {
+    document.addEventListener("PersonWalkingComplete", (e: any) => {
+      if (e.detail.whoId === "player") {
+        // Hero's position has changed
+        this.map?.checkForFootStepCutscene();
+      }
+    });
+  }
+
+  startMap(mapConfig: OverworldMapConfig) {
+    this.map = new OverworldMap(mapConfig);
+    this.map.overworld = this;
     this.map.mountObjects();
+  }
+
+  init(initData: OverworldMapsData) {
+    this.startMap(initData.ProfessorHouse);
 
     this.bindActionInput();
+    this.bindHeroPositionCheck();
 
     this.directionInput = new DirectionInput();
     this.directionInput.init();

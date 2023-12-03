@@ -49,18 +49,16 @@ function getCollisionsData(
   for (let i = 0; i < mapData.length; i += widthTiles) {
     collisionMap.push(mapData.slice(i, widthTiles + i));
   }
-  console.log(collisionMap);
 
   const walls: any = {};
   collisionMap.forEach((row, y) => {
     row.forEach((symbol, x) => {
       if (symbol === symbolNumber) {
-        console.log(x, y);
         walls[asGridCoord(x, y)] = true;
       }
     });
   });
-  // console.log(walls);
+
   return walls;
 }
 

@@ -1,16 +1,19 @@
 import { nextPosition, withGrid } from "../utils/utils";
 import GameObject, { EventConfig } from "./GameObject";
+import Overworld from "./Overworld";
 import OverworldEvent from "./OverworldEvent";
 import Person from "./Person";
 
 export interface OverworldMapConfig {
   gameObjects: { [key: string]: GameObject | Person };
-  walls: {};
+  walls: { [key: string]: boolean };
   lowerSrc: string;
   upperSrc: string;
+  cutsceneSpaces?: {};
 }
 
 class OverworldMap {
+  public overworld: Overworld | null;
   public gameObjects: { [key: string]: Person | GameObject };
   public walls: {
     [key: string]: boolean;
@@ -18,8 +21,11 @@ class OverworldMap {
   private lowerImage: HTMLImageElement;
   private upperImage: HTMLImageElement;
   public isCutscenePlaying: boolean;
+  private cutsceneSpaces?: any;
 
   constructor(config: OverworldMapConfig) {
+    this.overworld = null;
+
     this.gameObjects = config.gameObjects;
     this.walls = config.walls;
 
@@ -30,6 +36,7 @@ class OverworldMap {
     this.upperImage.src = config.upperSrc;
 
     this.isCutscenePlaying = false;
+    this.cutsceneSpaces = config.cutsceneSpaces;
   }
 
   drawLowerImage(
@@ -85,6 +92,7 @@ class OverworldMap {
           who: event.who,
           text: event.text,
           faceHero: event.faceHero,
+          map: event.map,
         },
       });
       await eventHandler.init();
@@ -107,6 +115,16 @@ class OverworldMap {
 
     if (!this.isCutscenePlaying && match && match.talking != undefined) {
       this.startCutscene(match.talking[0].events);
+    }
+  }
+
+  checkForFootStepCutscene() {
+    const player = this.gameObjects["player"];
+    if (this.cutsceneSpaces) {
+      const match = this.cutsceneSpaces[`${player.x},${player.y}`];
+      if (!this.isCutscenePlaying && match) {
+        this.startCutscene(match[0].events);
+      }
     }
   }
 

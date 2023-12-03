@@ -1,3 +1,4 @@
+import initData from "../initData";
 import { oppositeDirection } from "../utils/utils";
 import GameObject, { EventConfig } from "./GameObject";
 import OverworldMap from "./OverworldMap";
@@ -90,6 +91,13 @@ class OverworldEvent {
       });
       const container = document.querySelector(".game-online-container");
       if (container) message.init(container);
+    }
+  }
+
+  changeMap(resolve: () => void) {
+    if (this.event.map) {
+      this.map.overworld?.startMap(initData[this.event.map]);
+      resolve();
     }
   }
 

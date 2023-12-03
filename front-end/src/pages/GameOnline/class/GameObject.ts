@@ -9,6 +9,7 @@ export interface EventConfig {
   time?: number;
   text?: string;
   faceHero?: string;
+  map?: string;
 }
 
 export interface GameObjectConfig {
