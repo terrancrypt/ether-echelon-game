@@ -3,6 +3,7 @@ import { oppositeDirection } from "../utils/utils";
 import GameObject, { EventConfig } from "./GameObject";
 import OverworldMap from "./OverworldMap";
 import Person from "./Person";
+import SceneTransition from "./ScreenTransition";
 import TextMessage from "./TextMessage";
 
 interface OverworldEventConfig {
@@ -95,10 +96,17 @@ class OverworldEvent {
   }
 
   changeMap(resolve: () => void) {
-    if (this.event.map) {
-      this.map.overworld?.startMap(initData[this.event.map]);
-      resolve();
-    }
+    const sceneTransition = new SceneTransition();
+    sceneTransition.init(
+      document.querySelector(".game-online-container") as HTMLElement,
+      () => {
+        if (this.event.map) {
+          this.map.overworld?.startMap(initData[this.event.map]);
+          resolve();
+          sceneTransition.fadeOut();
+        }
+      }
+    );
   }
 
   init(): Promise<void> {

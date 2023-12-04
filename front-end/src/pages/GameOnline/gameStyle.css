@@ -44,3 +44,39 @@
 .text-message_button span {
     font-size: 4px
 }
+
+/* Screen Transition */
+.scene-transition {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+    opacity: 0;
+    animation: screen-transition-fade-in 1.2s forwards;
+}
+
+.scene-transition.fade-out {
+    animation: screen-transition-fade-out 1.2s forwards;
+}
+
+@keyframes screen-transition-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1
+    }
+}
+
+@keyframes screen-transition-fade-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0
+    }
+}
