@@ -1,4 +1,5 @@
 import KeyPressListener from "./KeyPressListener";
+import RevelingText from "./RevealingText";
 
 interface TextMessageConfig {
   text: string;
@@ -10,6 +11,7 @@ class TextMessage {
   onComplete: () => void;
   element: HTMLElement | null;
   actionListener: KeyPressListener | null;
+  revealingText?: RevelingText;
 
   constructor({ text, onComplete }: TextMessageConfig) {
     this.text = text;
@@ -24,11 +26,17 @@ class TextMessage {
     this.element.classList.add("text-message");
 
     this.element.innerHTML = `
-        <p class="text-message_text">${this.text}</p>
+        <p class="text-message_text"></p>
         <button class="text-message_button">Next
         <span>[Enter]</span>
         </button>
       `;
+
+    // Init the type writer effect
+    this.revealingText = new RevelingText({
+      element: this.element.querySelector(".text-message_text"),
+      text: this.text,
+    });
 
     this.element.querySelector("button")?.addEventListener("click", () => {
       // Close the text message
@@ -36,20 +44,26 @@ class TextMessage {
     });
 
     this.actionListener = new KeyPressListener("Enter", () => {
-      this.actionListener?.unbind();
       this.done();
     });
   }
 
   done() {
-    this.element?.remove();
-    this.onComplete();
+    if (this.revealingText?.isDone) {
+      this.element?.remove();
+      this.actionListener?.unbind();
+      this.onComplete();
+    }
+    {
+      this.revealingText?.warpToDone();
+    }
   }
 
   init(container: Element): void {
     this.createElement();
     if (this.element) {
       container.appendChild(this.element);
+      this.revealingText?.init();
     }
   }
 }

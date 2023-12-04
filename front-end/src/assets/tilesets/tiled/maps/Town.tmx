@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="31" height="41" tilewidth="16" tileheight="16" infinite="0" nextlayerid="17" nextobjectid="1">
  <editorsettings>
-  <export target="../../maps/Town/Town.tmj" format="json"/>
+  <export target="../../../maps/Town/Town.tmj" format="json"/>
  </editorsettings>
- <tileset firstgid="1" source="../../tiledsets/atlas_16x.tsx"/>
- <tileset firstgid="769" source="../../maps/Town/Tileset_Ground.tsx"/>
- <tileset firstgid="2281" source="../../maps/Town/Tileset_Road.tsx"/>
- <tileset firstgid="2341" source="../../maps/Town/Buildings.tsx"/>
- <tileset firstgid="2783" source="../../maps/Town/Props.tsx"/>
- <tileset firstgid="2963" source="../../maps/Town/Trees_Bushes.tsx"/>
+ <tileset firstgid="1" source="../tiledsets/atlas_16x.tsx"/>
+ <tileset firstgid="769" source="../../../maps/Town/Tileset_Ground.tsx"/>
+ <tileset firstgid="2281" source="../tiledsets/Tileset_Road.tsx"/>
+ <tileset firstgid="2341" source="../tiledsets/Buildings.tsx"/>
+ <tileset firstgid="2783" source="../tiledsets/Props.tsx"/>
+ <tileset firstgid="2963" source="../tiledsets/Trees_Bushes.tsx"/>
+ <tileset firstgid="3107" name="atlas_16x" tilewidth="16" tileheight="16" tilecount="768" columns="48">
+  <image source="../../spriteSheets/atlas_16x.png" width="768" height="256"/>
+ </tileset>
  <layer id="5" name="Ground-1" width="31" height="41">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

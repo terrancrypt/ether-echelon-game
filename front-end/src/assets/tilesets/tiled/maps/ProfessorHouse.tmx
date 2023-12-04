@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="16" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="11" nextobjectid="1">
  <editorsettings>
-  <export target="../../maps/ProfessorHouse/ProfessorHouse.tmj" format="json"/>
+  <export target="../../../maps/ProfessorHouse/ProfessorHouse.tmj" format="json"/>
  </editorsettings>
- <tileset firstgid="1" source="../../tiledsets/atlas_16x.tsx"/>
+ <tileset firstgid="1" source="../tiledsets/atlas_16x.tsx"/>
+ <tileset firstgid="769" name="atlas_16x" tilewidth="16" tileheight="16" tilecount="768" columns="48">
+  <image source="../../spriteSheets/atlas_16x.png" width="768" height="256"/>
+ </tileset>
  <layer id="5" name="Floor" width="16" height="16">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
