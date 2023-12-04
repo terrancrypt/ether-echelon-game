@@ -8,7 +8,11 @@ import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 contract GameAssetsNFT is ERC1155, Ownable, ERC1155Burnable {
+    error TokenDoesNotExist();
+
     string private s_ipfsHash;
+
+    mapping(uint256 tokenId => bool) private s_isTokenExists;
 
     constructor(
         address initialOwner,
@@ -17,23 +21,93 @@ contract GameAssetsNFT is ERC1155, Ownable, ERC1155Burnable {
         s_ipfsHash = ipfsHash;
     }
 
+    event IpfsHashChanged(string ifpsHash);
+    event AddTokenId(uint256 tokenId);
+    event AddTokenIds(uint256[] tokenIds);
+    event TokenStateChanged(uint256 tokenId, bool state);
+
+    // ========== Owner Function ==========
+    // Update Ipfs Hash for dynamic NFTs, game balance or possible updates
+    function setIpfsHash(string memory newIpfsHash) public onlyOwner {
+        s_ipfsHash = newIpfsHash;
+        emit IpfsHashChanged(newIpfsHash);
+    }
+
+    function addSingleTokenId(uint256 _tokenId) external onlyOwner {
+        s_isTokenExists[_tokenId] = true;
+        emit AddTokenId(_tokenId);
+    }
+
+    function addMultipleTokenIds(
+        uint256[] calldata _tokenIds
+    ) external onlyOwner {
+        for (uint256 i; i < _tokenIds.length; i++) {
+            uint256 tokenId = _tokenIds[i];
+            s_isTokenExists[tokenId] = true;
+        }
+        emit AddTokenIds(_tokenIds);
+    }
+
+    function updateTokenState(
+        uint256 _tokenId,
+        bool _state
+    ) external onlyOwner {
+        s_isTokenExists[_tokenId] = _state;
+        emit TokenStateChanged(_tokenId, _state);
+    }
+
     // ========== Mint Functions ==========
     function mint(
         address account,
-        uint256 id,
+        uint256 _tokenId,
         uint256 amount,
         bytes memory data
-    ) public onlyOwner {
-        _mint(account, id, amount, data);
+    ) external onlyOwner {
+        if (s_isTokenExists[_tokenId] == false) {
+            revert TokenDoesNotExist();
+        }
+        _mint(account, _tokenId, amount, data);
     }
 
     function mintBatch(
         address to,
-        uint256[] memory ids,
+        uint256[] memory tokenIds,
         uint256[] memory amounts,
         bytes memory data
-    ) public onlyOwner {
-        _mintBatch(to, ids, amounts, data);
+    ) external onlyOwner {
+        for (uint256 i; i < tokenIds.length; i++) {
+            uint256 tokenId = tokenIds[i];
+            if (s_isTokenExists[tokenId] == false) {
+                revert TokenDoesNotExist();
+            }
+        }
+        _mintBatch(to, tokenIds, amounts, data);
+    }
+
+    // ========== Burn Functions ==========
+    function burn(
+        address account,
+        uint256 _tokenId,
+        uint256 amount
+    ) public override {
+        if (s_isTokenExists[_tokenId] == false) {
+            revert TokenDoesNotExist();
+        }
+        super.burn(account, _tokenId, amount);
+    }
+
+    function burnBatch(
+        address account,
+        uint256[] memory tokenIds,
+        uint256[] memory amounts
+    ) public override {
+        for (uint256 i; i < tokenIds.length; i++) {
+            uint256 tokenId = tokenIds[i];
+            if (s_isTokenExists[tokenId] == false) {
+                revert TokenDoesNotExist();
+            }
+        }
+        super.burnBatch(account, tokenIds, amounts);
     }
 
     // ========== URI Functions ==========
@@ -66,8 +140,8 @@ contract GameAssetsNFT is ERC1155, Ownable, ERC1155Burnable {
             );
     }
 
-    // Update Ipfs Hash for dynamic NFTs, game balance or possible updates
-    function setIpfsHash(string memory newIpfsHash) public onlyOwner {
-        s_ipfsHash = newIpfsHash;
+    // ========== Getter Functions ==========
+    function getIsTokenExists(uint256 _tokenId) public view returns (bool) {
+        return s_isTokenExists[_tokenId];
     }
 }

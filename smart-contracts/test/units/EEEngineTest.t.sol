@@ -15,9 +15,7 @@ contract EEEngineTest is Test {
     ERC6551Account implementation;
     ERC6551Registry registry;
     AccountNFT accountNft;
-    GameAssetsNFT beastsNft;
-    GameAssetsNFT chestsNft;
-    GameAssetsNFT eeCoinNft;
+    GameAssetsNFT gameAssetsNft;
     EEEngine engine;
 
     address owner = makeAddr("owner");
@@ -32,23 +30,17 @@ contract EEEngineTest is Test {
         accountNft = new AccountNFT(owner);
         implementation = new ERC6551Account();
         registry = new ERC6551Registry(owner, accountNft, implementation);
-        beastsNft = new GameAssetsNFT(owner, IPFS_HASH);
-        chestsNft = new GameAssetsNFT(owner, IPFS_HASH);
-        eeCoinNft = new GameAssetsNFT(owner, IPFS_HASH);
+        gameAssetsNft = new GameAssetsNFT(owner, IPFS_HASH);
         engine = new EEEngine(
             owner,
             address(registry),
             address(accountNft),
-            address(beastsNft),
-            address(eeCoinNft),
-            address(chestsNft)
+            address(gameAssetsNft)
         );
         vm.startPrank(owner);
         accountNft.transferOwnership(address(engine));
         registry.transferOwnership(address(engine));
-        beastsNft.transferOwnership(address(engine));
-        chestsNft.transferOwnership(address(engine));
-        eeCoinNft.transferOwnership(address(engine));
+        gameAssetsNft.transferOwnership(address(engine));
         vm.stopPrank();
     }
 

@@ -12,9 +12,7 @@ contract EEEngine is Ownable {
 
     IERC6551Registry private immutable i_erc6551Registry;
     AccountNFT private immutable i_account;
-    GameAssetsNFT private immutable i_beasts;
-    GameAssetsNFT private immutable i_EECoin;
-    GameAssetsNFT private immutable i_chests;
+    GameAssetsNFT private immutable i_gameAssets;
 
     uint256 private constant STARTER_BEASTS_ID = 0;
 
@@ -24,19 +22,15 @@ contract EEEngine is Ownable {
     constructor(
         address initialOwner,
         address erc6551Registry,
-        address accountNft,
-        address beastsNft,
-        address eeCoin,
-        address chestsNft
+        address accountNftAddress,
+        address gameAssetsAddress
     ) Ownable(initialOwner) {
         i_erc6551Registry = IERC6551Registry(erc6551Registry);
-        i_account = AccountNFT(accountNft);
-        i_beasts = GameAssetsNFT(beastsNft);
-        i_EECoin = GameAssetsNFT(eeCoin);
-        i_chests = GameAssetsNFT(chestsNft);
+        i_account = AccountNFT(accountNftAddress);
+        i_gameAssets = GameAssetsNFT(gameAssetsAddress);
     }
 
-    // ========== Owner Functions ==========
+    // ========== Owner's Functionality Inherited ==========
     function addIpfsImageHash(string memory _ipfsImageHash) public onlyOwner {
         i_account.addIpfsImageHash(_ipfsImageHash);
     }
@@ -59,18 +53,17 @@ contract EEEngine is Ownable {
 
         i_account.updateAddrForAccount(accountId, accountAddr);
 
-        s_tokenIdToAddress[_tokenId] = accountAddr;
+        s_tokenIdToAddress[accountId] = accountAddr;
 
         return accountAddr;
     }
 
     function _mintGameAssetsNft(
         address to,
-        address tokenAddr,
         uint256 tokenId,
         uint256 amount,
         bytes memory data
     ) internal {
-        GameAssetsNFT(tokenAddr).mint(to, tokenId, amount, data);
+        i_gameAssets.mint(to, tokenId, amount, data);
     }
 }
