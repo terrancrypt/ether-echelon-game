@@ -1,13 +1,15 @@
-import { readContract, watchContractEvent, writeContract } from "wagmi/actions";
-import AccountNftAbi from "../ABIs/AccountNftAbi.json";
+import { readContract, writeContract } from "wagmi/actions";
+import dataContract from "./dataContract";
+import { ACCOUNT_NFT_CONTRACT } from "./constants";
 
-export const accountNftContract = "0x389B03F73f29c3234486eB01b714f027281311fc";
+const address = dataContract[ACCOUNT_NFT_CONTRACT].address as any;
+const abi = dataContract[ACCOUNT_NFT_CONTRACT].abi;
 
 // Read
 const checkOwner = async (tokenId: string) => {
   const result = await readContract({
-    address: accountNftContract,
-    abi: AccountNftAbi,
+    address: address,
+    abi: abi,
     functionName: "ownerOf",
     args: [tokenId],
   });
@@ -16,8 +18,8 @@ const checkOwner = async (tokenId: string) => {
 
 const getTokenUri = async (tokenId: string) => {
   const result = await readContract({
-    address: accountNftContract,
-    abi: AccountNftAbi,
+    address: address,
+    abi: abi,
     functionName: "tokenURI",
     args: [tokenId],
   });
@@ -29,6 +31,16 @@ const getTokenUri = async (tokenId: string) => {
   return tokenURI;
 };
 
+const getTokenCount = async () => {
+  const result = await readContract({
+    address: address,
+    abi: abi,
+    functionName: "getCurrentTokenCount",
+    args: [],
+  });
+  return result;
+};
+
 // Write
 const mintAccountNft = async (
   owner: string,
@@ -37,8 +49,8 @@ const mintAccountNft = async (
 ): Promise<string | null> => {
   try {
     const { hash } = await writeContract({
-      address: accountNftContract,
-      abi: AccountNftAbi,
+      address: address,
+      abi: abi,
       functionName: "mintNFT",
       args: [owner, { username, ipfsImageHash }],
     });
@@ -49,4 +61,4 @@ const mintAccountNft = async (
   }
 };
 
-export { mintAccountNft, checkOwner, getTokenUri };
+export { mintAccountNft, checkOwner, getTokenUri, getTokenCount };

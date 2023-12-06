@@ -1,0 +1,184 @@
+.text-message {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 36px;
+    font-size: 4px;
+    background: white;
+    border-top: 1px solid black;
+    color: black;
+}
+
+.text-message_text {
+    margin: 0;
+    font-size: 8px;
+}
+
+.text-message span {
+    opacity: 0;
+}
+
+.text-message span.revealed {
+    opacity: 1;
+}
+
+.text-message_button {
+    margin: 0;
+    font-size: 5px;
+    padding: 0;
+    -webkit-appearance: none;
+    background: none;
+    border: 0;
+    font-family: inherit;
+    cursor: pointer;
+
+    position: absolute;
+    right: 2px;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.text-message_button span {
+    font-size: 4px
+}
+
+/* Screen Transition */
+.scene-transition {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+    opacity: 0;
+    animation: screen-transition-fade-in 1.2s forwards;
+}
+
+.scene-transition.fade-out {
+    animation: screen-transition-fade-out 1.2s forwards;
+}
+
+@keyframes screen-transition-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1
+    }
+}
+
+@keyframes screen-transition-fade-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0
+    }
+}
+
+
+/* Battle */
+.battle {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: #fff;
+    background-image: url('../../assets/maps/BattleGroundTown/BattleGroundTown.png');
+    background-size: cover;
+    image-rendering: pixelated;
+}
+
+
+.battle_player,
+.battle_enemy {
+    position: absolute;
+    transform: scale(2);
+    width: 8px;
+    height: 12px;
+    overflow: hidden;
+    background: url('/images/Characters/Shadow.png');
+    background-size: 6px 6px;
+}
+
+.battle_player img,
+.battle_enemy img {
+    pointer-events: none;
+    width: 32px !important;
+    max-width: none !important;
+}
+
+.battle_player {
+    bottom: 40px;
+    left: 70px;
+}
+
+.battle_player img {
+    transform: translateY(-34px);
+}
+
+.battle_enemy {
+    top: 90px;
+    right: 100px;
+}
+
+/* Combatant */
+.combatant {
+    width: 90px;
+    height: 40px;
+    background-image: url('/images/GUI/SingleMemberDisplay.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    position: absolute;
+    scale: .8;
+}
+
+.combatant[data-team="player"] {
+    top: 100px;
+    left: 70px;
+}
+
+.combatant[data-team="enemy"] {
+    top: 28px;
+    right: 77px;
+}
+
+.combatant_name {
+    font-size: 4px;
+}
+
+.combatant_character-crop {
+    position: absolute;
+    overflow: hidden;
+}
+
+.combatant_character {
+    display: block;
+    position: absolute;
+    top: 3px;
+    left: 6px;
+    max-width: none;
+    max-height: none;
+    width: 15px;
+    height: 15px;
+}
+
+.battle .combatant_character-crop {
+    display: none;
+}
+
+.combatant_name {
+    position: absolute;
+    top: -8px;
+    left: 4px;
+    background-color: #fff;
+    color: black;
+    padding: 1px 2px 1px 2px;
+    white-space: nowrap;
+}

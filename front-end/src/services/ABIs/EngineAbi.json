@@ -1,0 +1,111 @@
+[
+  {
+    "inputs": [
+      { "internalType": "address", "name": "initialOwner", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "erc6551Registry",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "accountNftAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "gameAssetsAddress",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  { "inputs": [], "name": "EEEngine__AddressAlreadyExists", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "owner", "type": "address" }
+    ],
+    "name": "OwnableInvalidOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "OwnableUnauthorizedAccount",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "_ipfsImageHash", "type": "string" }
+    ],
+    "name": "addIpfsImageHash",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "string", "name": "username", "type": "string" },
+          {
+            "internalType": "string",
+            "name": "ipfsImageHash",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct AccountNFT.AccountInfor",
+        "name": "_accountInfor",
+        "type": "tuple"
+      }
+    ],
+    "name": "createAccount",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

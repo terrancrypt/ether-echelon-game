@@ -6,10 +6,12 @@ export type UserDataType = {
     ownerAddr: string;
   };
   gameInfor: {
+    character: string;
     direction: string;
     position: {
       x: number;
       y: number;
     };
+    movingProgressRemaining: number;
   };
 };

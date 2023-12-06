@@ -5,16 +5,20 @@ import {
   waitForTransaction,
   watchContractEvent,
 } from "wagmi/actions";
-
-import AccountNftAbi from "../../services/ABIs/AccountNftAbi.json";
 import { formatUnits } from "viem";
-import {
-  accountNftContract,
-  mintAccountNft,
-} from "../../services/contract-services/AccountNftServ";
 import { shortenAddr } from "../../utils/addrUtils";
 import { addTokenToWallet } from "../../utils/metamask";
 import { charactersData } from "../../data/charaters";
+import { createAccountNftWithAddress } from "../../services/contract-services/EngineServ";
+import dataContract from "../../services/contract-services/dataContract";
+import {
+  ENGINE_CONTRACT,
+  ERC6551_REGISTRY_CONTRACT,
+} from "../../services/contract-services/constants";
+import {
+  addDocToFireStore,
+  getAllDataFromFirestore,
+} from "../../services/firebase/fireStore";
 
 const { Option } = Select;
 
@@ -51,45 +55,45 @@ const CreateAccountPage: React.FC = () => {
     }
   };
 
+  watchContractEvent(
+    {
+      address: dataContract[ERC6551_REGISTRY_CONTRACT].address as any,
+      abi: dataContract[ERC6551_REGISTRY_CONTRACT].abi,
+      eventName: "AccountCreated",
+    },
+    (log: any) => {
+      console.log(log);
+      // if (log[0].args.account === address) {
+      //   try {
+      //     // const storedData = window.localStorage.getItem("userData");
+      //     // const userDataArray = storedData ? JSON.parse(storedData) : [];
+      //     // const newData = {
+      //     //   address: log[0].args.owner,
+      //     //   username: values.username,
+      //     //   character: values.character,
+      //     //   tokenId: formatUnits(log[0].args.tokenId, 0),
+      //     // };
+      //     // userDataArray.push(newData);
+      //     // window.localStorage.setItem(
+      //     //   "userData",
+      //     //   JSON.stringify(userDataArray)
+      //     // );
+      //     // fetchAccountList();
+
+      //     console.log(log);
+      //   } catch (error) {
+      //     console.log(error);
+      //   }
+      // }
+    }
+  );
+
   const onFinish = async (values: AccountInfor) => {
     setIsLoading(true);
     try {
       const { ipfsHash } = charactersData[values.character];
-      watchContractEvent(
-        {
-          address: accountNftContract,
-          abi: AccountNftAbi,
-          eventName: "AccountNftMinted",
-        },
-        (log: any) => {
-          if (log[0].args.owner === address) {
-            try {
-              const storedData = window.localStorage.getItem("userData");
-              const userDataArray = storedData ? JSON.parse(storedData) : [];
-              const newData = {
-                address: log[0].args.owner,
-                username: values.username,
-                character: values.character,
-                tokenId: formatUnits(log[0].args.tokenId, 0),
-              };
-              userDataArray.push(newData);
-              window.localStorage.setItem(
-                "userData",
-                JSON.stringify(userDataArray)
-              );
-              fetchAccountList();
-            } catch (error) {
-              console.log(error);
-            }
-          }
-        }
-      );
 
-      const hash = await mintAccountNft(
-        address as string,
-        values.username,
-        ipfsHash
-      );
+      const hash = await createAccountNftWithAddress(values.username, ipfsHash);
 
       if (hash) {
         setTxHash(hash);
@@ -103,6 +107,7 @@ const CreateAccountPage: React.FC = () => {
         message.error("Transaction error!");
       }
     } catch (error) {
+      console.log(error);
       message.error("Transaction error!");
     } finally {
       setIsLoading(false);
@@ -136,6 +141,9 @@ const CreateAccountPage: React.FC = () => {
 
   useEffect(() => {
     fetchAccountList();
+
+    getAllDataFromFirestore();
+    addDocToFireStore(1, "0x89865e03c04d9f51614087f6f9c58a1972bdbff4");
   }, []);
 
   return (
@@ -262,8 +270,8 @@ const CreateAccountPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {accountCreated?.map((account) => (
-                    <tr className="text-[10px]">
+                  {accountCreated?.map((account, index) => (
+                    <tr className="text-[10px]" key={index}>
                       <td className="py-4">{account.username}</td>
                       <td className="py-4">{account.character}</td>
                       <td className="py-4">{account.tokenId}</td>

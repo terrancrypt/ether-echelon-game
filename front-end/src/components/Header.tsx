@@ -60,7 +60,7 @@ const Header = () => {
         <>
           {isDisconnected ? (
             <button
-              className="button-connect font-bold text-base uppercase border isolate px-[40px] py-3 relative hover:text-black"
+              className="button-connect font-bold text-xs uppercase border isolate px-[40px] py-3 relative hover:text-black"
               onClick={() => open()}
             >
               <span>Connect Wallet</span>

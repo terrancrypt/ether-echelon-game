@@ -2,16 +2,12 @@ import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged, signInAnonymously } from "firebase/auth";
 import {
   DatabaseReference,
-  child,
-  get,
   getDatabase,
   onDisconnect,
-  onValue,
   ref,
   set,
 } from "firebase/database";
 import { UserDataType } from "./UserDataType";
-import initGame from "../../pages/GamePage/game-logic/initGame";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDjJSw7Itcf21WeBk8BrCXybzvicmd5H3E",
@@ -24,54 +20,47 @@ const firebaseConfig = {
   measurementId: "G-1XEWMTDKMT",
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+export const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const realtimeDatabase = getDatabase(app);
+
 let playerRef: DatabaseReference;
-let playerId: string;
+export let playerId: string;
 
-export function initFireBase() {
-  const auth = getAuth(app);
-  signInAnonymously(auth)
-    .then(() => {
-      console.log("Login Success!");
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log("Error code: ", errorCode);
-      console.log("Error message: ", errorMessage);
+export async function initFireBase() {
+  try {
+    await signInAnonymously(auth);
+
+    await new Promise<void>((resolve) => {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+          playerId = user.uid;
+
+          playerRef = ref(realtimeDatabase, `players/${playerId}`);
+
+          onDisconnect(playerRef).remove();
+
+          resolve();
+          unsubscribe();
+        }
+      });
     });
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      playerId = user.uid;
-
-      playerRef = ref(db, `players/${playerId}`);
-
-      onDisconnect(playerRef).remove();
-
-      readUserData();
-    } else {
-      console.log("You logout");
-    }
-  });
+  } catch (error) {
+    console.error("Error during Firebase initialization:", error);
+  }
 }
 
 export function writeUserData(userData: UserDataType) {
   set(playerRef, {
+    id: playerId,
     tokenId: userData.accountInfor.tokenId,
     username: userData.accountInfor.username,
     address: userData.accountInfor.accountAddr,
-    character: userData.accountInfor.ownerAddr,
+    character: userData.gameInfor.character,
     direction: userData.gameInfor.direction,
     position: {
       x: userData.gameInfor.position.x,
       y: userData.gameInfor.position.y,
     },
   });
-}
-
-export function readUserData() {
-  const allPlayerRef = ref(db, "players");
-  console.log(allPlayerRef);
 }

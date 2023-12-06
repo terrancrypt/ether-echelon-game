@@ -1,4 +1,5 @@
-import { accountNftContract } from "../services/contract-services/AccountNftServ";
+import { ACCOUNT_NFT_CONTRACT } from "../services/contract-services/constants";
+import dataContract from "../services/contract-services/dataContract";
 
 interface WindowChain extends Window {
   ethereum?: any;
@@ -11,7 +12,7 @@ const addTokenToWallet = async (tokenId: string): Promise<boolean> => {
       params: {
         type: "ERC721",
         options: {
-          address: accountNftContract,
+          address: dataContract[ACCOUNT_NFT_CONTRACT].address,
           tokenId: tokenId,
         },
       },

@@ -16,6 +16,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             fontFamily: "Press Start 2P",
             fontSize: 11,
           },
+          Spin: {
+            colorPrimary: "#fff",
+          },
         },
       }}
     >

@@ -1,5 +1,6 @@
 interface BeastsData {
   [beastName: string]: {
+    name: string;
     assets: {
       avatar: string;
       inGameImg: string;
@@ -17,9 +18,10 @@ interface BeastsData {
 
 export const beastsData: BeastsData = {
   RedButterfly: {
+    name: "Red ButterFly",
     assets: {
-      avatar: "",
-      inGameImg: "",
+      avatar: "src/assets/beasts/ButterflyRed/Faceset.png",
+      inGameImg: "src/assets/beasts/ButterflyRed/SpriteSheet.png",
     },
     evolutionable: false,
     type: "Fire",
@@ -31,9 +33,25 @@ export const beastsData: BeastsData = {
     skills: ["Burn"],
   },
   Axolot: {
+    name: "Axolot",
     assets: {
-      avatar: "",
-      inGameImg: "",
+      avatar: "src/assets/beasts/Axolot/Faceset.png",
+      inGameImg: "src/assets/beasts/Axolot/SpriteSheet.png",
+    },
+    evolutionable: false,
+    type: "Water",
+    index: {
+      hp: 100,
+      attack: 20,
+      defend: 10,
+    },
+    skills: ["Water Jet"],
+  },
+  Bamboo: {
+    name: "Bamboo",
+    assets: {
+      avatar: "src/assets/beasts/Bamboo/Faceset.png",
+      inGameImg: "src/assets/beasts/Bamboo/SpriteSheet.png",
     },
     evolutionable: false,
     type: "Water",

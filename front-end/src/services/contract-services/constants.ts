@@ -1,0 +1,5 @@
+const ENGINE_CONTRACT = "engineContract";
+const ACCOUNT_NFT_CONTRACT = "accountNftContract";
+const ERC6551_REGISTRY_CONTRACT = "erc6551Registry";
+
+export { ENGINE_CONTRACT, ACCOUNT_NFT_CONTRACT, ERC6551_REGISTRY_CONTRACT };
