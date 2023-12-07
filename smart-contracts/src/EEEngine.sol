@@ -7,6 +7,9 @@ import {AccountNFT} from "src/nft/AccountNFT.sol";
 import {GameAssetsNFT} from "src/nft/GameAssetsNFT.sol";
 import {IERC6551Registry} from "src/interfaces/IERC6551Registry.sol";
 
+/// @title Eche Echelon Engine Contract
+/// @author Terrancrypt
+/// @notice This Contract Engine inherits from all other contracts in the Ether Echelon Game application to run everything centrally into a single contract for both owner and user. This only supports hackathons and there will definitely be changes in the future.
 contract EEEngine is Ownable {
     error EEEngine__AddressAlreadyExists();
 
@@ -30,14 +33,41 @@ contract EEEngine is Ownable {
         i_gameAssets = GameAssetsNFT(gameAssetsAddress);
     }
 
-    // ========== Owner's Functionality Inherited ==========
-    function addIpfsImageHash(string memory _ipfsImageHash) public onlyOwner {
+    ///////////////////////////////////////////////////
+    // ========== Owner's Function Inherited ==========
+    ///////////////////////////////////////////////////
+
+    function addIpfsImageHashForAccountNft(
+        string memory _ipfsImageHash
+    ) public onlyOwner {
         i_account.addIpfsImageHash(_ipfsImageHash);
+    }
+
+    function setUpIfpsHashForGameAssets(
+        string memory _ipfsHash
+    ) public onlyOwner {
+        i_gameAssets.setIpfsHash(_ipfsHash);
+    }
+
+    function addSingleTokenIdForGameAssets(uint256 _tokenId) public onlyOwner {
+        i_gameAssets.addSingleTokenId(_tokenId);
+    }
+
+    function addMultipleTokenIdsGameAssets(
+        uint256[] calldata _tokenIds
+    ) public onlyOwner {
+        i_gameAssets.addMultipleTokenIds(_tokenIds);
+    }
+
+    function updateTokenStateInGameAssets(
+        uint256 _tokenId,
+        bool _state
+    ) public onlyOwner {
+        i_gameAssets.updateTokenState(_tokenId, _state);
     }
 
     /// @notice Mint an account nft and create address for it
     /// @dev functions i_account.mintNft() and i_erc6551Registry.createAccount() can only be called in this contract. This ensures each AccountNFT can only generate a single address, ensuring game consistency.
-    /// @param _accountInfor includes 2 parameters, `username` (customized by the user) no shorter than 5 characters and no longer than 15 characters. `ipfsImageHash` is predefined which ipfsImageHash will represent the game character. Maybe this will change in the future where ipfsImageHash can let users change their avatars or sell avatar icon packs in the game, then the AccountInfor struct will have an additional parameter, characterName.
     function createAccount(
         AccountNFT.AccountInfor calldata _accountInfor
     ) public returns (address) {
@@ -58,7 +88,7 @@ contract EEEngine is Ownable {
         return accountAddr;
     }
 
-    function _mintGameAssetsNft(
+    function _mintGameAssets(
         address to,
         uint256 tokenId,
         uint256 amount,

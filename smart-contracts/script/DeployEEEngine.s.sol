@@ -10,6 +10,8 @@ import {AccountNFT} from "src/nft/AccountNFT.sol";
 
 contract DeployEEEngine is Script {
     address owner = 0x7f4A3Fe909524CEa8C91fFdEf717C797581AE36D;
+    bytes32 public constant ENGINE_CONTRACT_ROLE =
+        keccak256("ENGINE_CONTRACT_ROLE");
 
     EEEngine engine;
     ERC6551Account erc6551Account;

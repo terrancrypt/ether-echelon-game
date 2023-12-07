@@ -35,6 +35,52 @@ contract AccountNFT is ERC721, Ownable {
     event AccountNftMinted(address indexed owner, uint256 tokenId);
     event UserNameUpdated(uint256 indexed tokenId, string newUsername);
 
+    //////////////////////////////////////////
+    // ========== Owner's Functions ==========
+    //////////////////////////////////////////
+    function addIpfsImageHash(string memory _ipfsImageHash) external onlyOwner {
+        if (s_isImageHash[_ipfsImageHash] == true) {
+            revert AccountNFT_ImageHashAlreadyExists();
+        }
+        s_ipfsImageHash[s_currentImageHash] = _ipfsImageHash;
+        s_isImageHash[_ipfsImageHash] = true;
+        s_currentImageHash++;
+    }
+
+    function updateAddrForAccount(
+        uint256 _tokenId,
+        address _accountAddr
+    ) external onlyOwner {
+        s_tokenIdToAddr[_tokenId] = _accountAddr;
+    }
+
+    //////////////////////////////////////////
+    // ========== Public Functions ===========
+    //////////////////////////////////////////
+    function updateUserName(uint256 tokenId, string memory newUsername) public {
+        if (_ownerOf(tokenId) != msg.sender) {
+            revert AccountNFT_InvalidOwner();
+        }
+        if (bytes(newUsername).length > 15 || bytes(newUsername).length < 5) {
+            revert AccountNFT_ExceededLength();
+        }
+        if (s_isUsername[newUsername] == true) {
+            revert AccountNFT_UsernameAlreadyExists();
+        }
+
+        s_tokenInfo[tokenId].username = newUsername;
+
+        string memory pastUsername = s_tokenInfo[tokenId].username;
+
+        s_isUsername[newUsername] = true;
+        s_isUsername[pastUsername] = false;
+
+        emit UserNameUpdated(tokenId, newUsername);
+    }
+
+    ///////////////////////////////////////////
+    // ========== External Functions ==========
+    ///////////////////////////////////////////
     function mintNFT(
         address _owner,
         AccountInfor calldata _accountInfor
@@ -61,6 +107,9 @@ contract AccountNFT is ERC721, Ownable {
         emit AccountNftMinted(_owner, tokenId);
     }
 
+    ///////////////////////////////////////////////////////
+    // ========== Public View / Getter Functions ==========
+    ///////////////////////////////////////////////////////
     function _baseURI() internal pure override returns (string memory) {
         return "data:application/json;base64,";
     }
@@ -96,44 +145,6 @@ contract AccountNFT is ERC721, Ownable {
             );
     }
 
-    function updateUserName(uint256 tokenId, string memory newUsername) public {
-        if (_ownerOf(tokenId) != msg.sender) {
-            revert AccountNFT_InvalidOwner();
-        }
-        if (bytes(newUsername).length > 15 || bytes(newUsername).length < 5) {
-            revert AccountNFT_ExceededLength();
-        }
-        if (s_isUsername[newUsername] == true) {
-            revert AccountNFT_UsernameAlreadyExists();
-        }
-
-        s_tokenInfo[tokenId].username = newUsername;
-
-        string memory pastUsername = s_tokenInfo[tokenId].username;
-
-        s_isUsername[newUsername] = true;
-        s_isUsername[pastUsername] = false;
-
-        emit UserNameUpdated(tokenId, newUsername);
-    }
-
-    function addIpfsImageHash(string memory _ipfsImageHash) external onlyOwner {
-        if (s_isImageHash[_ipfsImageHash] == true) {
-            revert AccountNFT_ImageHashAlreadyExists();
-        }
-        s_ipfsImageHash[s_currentImageHash] = _ipfsImageHash;
-        s_isImageHash[_ipfsImageHash] = true;
-        s_currentImageHash++;
-    }
-
-    function updateAddrForAccount(
-        uint256 _tokenId,
-        address _accountAddr
-    ) external onlyOwner {
-        s_tokenIdToAddr[_tokenId] = _accountAddr;
-    }
-
-    // ========== Getter Functions =========
     function getCurrentTokenCount() public view returns (uint256) {
         return s_tokenCounter;
     }

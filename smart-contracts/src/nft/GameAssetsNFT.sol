@@ -26,8 +26,11 @@ contract GameAssetsNFT is ERC1155, Ownable, ERC1155Burnable {
     event AddTokenIds(uint256[] tokenIds);
     event TokenStateChanged(uint256 tokenId, bool state);
 
+    ///////////////////////////////////////
     // ========== Owner Function ==========
-    // Update Ipfs Hash for dynamic NFTs, game balance or possible updates
+    ///////////////////////////////////////
+
+    /// @dev Update Ipfs Hash for dynamic NFTs, game balance or possible updates
     function setIpfsHash(string memory newIpfsHash) public onlyOwner {
         s_ipfsHash = newIpfsHash;
         emit IpfsHashChanged(newIpfsHash);
@@ -56,7 +59,10 @@ contract GameAssetsNFT is ERC1155, Ownable, ERC1155Burnable {
         emit TokenStateChanged(_tokenId, _state);
     }
 
-    // ========== Mint Functions ==========
+    ////////////////////////////////////////////////
+    // ========== External Mint Functions ==========
+    ////////////////////////////////////////////////
+
     function mint(
         address account,
         uint256 _tokenId,
@@ -84,7 +90,10 @@ contract GameAssetsNFT is ERC1155, Ownable, ERC1155Burnable {
         _mintBatch(to, tokenIds, amounts, data);
     }
 
-    // ========== Burn Functions ==========
+    ////////////////////////////////////////////////
+    // ========== External Burn Functions ==========
+    ////////////////////////////////////////////////
+
     function burn(
         address account,
         uint256 _tokenId,
@@ -110,8 +119,11 @@ contract GameAssetsNFT is ERC1155, Ownable, ERC1155Burnable {
         super.burnBatch(account, tokenIds, amounts);
     }
 
+    //////////////////////////////////////
     // ========== URI Functions ==========
-    // Override uri function to provide token-specific metadata
+    //////////////////////////////////////
+
+    /// @notice Override uri function to provide token-specific metadata
     function uri(
         uint256 _tokenId
     ) public view override returns (string memory) {
@@ -127,7 +139,7 @@ contract GameAssetsNFT is ERC1155, Ownable, ERC1155Burnable {
             );
     }
 
-    // Provide URI for the entire contract
+    /// @notice Provide URI for the entire contract
     function contractURI() public view returns (string memory) {
         return
             string(
@@ -140,7 +152,9 @@ contract GameAssetsNFT is ERC1155, Ownable, ERC1155Burnable {
             );
     }
 
-    // ========== Getter Functions ==========
+    ///////////////////////////////////////////////////////
+    // ========== Public View / Getter Functions ==========
+    ///////////////////////////////////////////////////////
     function getIsTokenExists(uint256 _tokenId) public view returns (bool) {
         return s_isTokenExists[_tokenId];
     }

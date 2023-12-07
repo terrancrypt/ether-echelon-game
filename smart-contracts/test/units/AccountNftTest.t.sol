@@ -107,9 +107,7 @@ contract AccountNftTest is Test {
     function test_canAddIfpsImageHash() public {
         vm.prank(owner);
         token.addIpfsImageHash(IPFS_HASH);
-
         string memory expectedHash = token.getIpfsImageHashById(0);
-
         assertEq(IPFS_HASH, expectedHash);
     }
 }

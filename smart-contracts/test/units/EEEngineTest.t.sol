@@ -46,7 +46,7 @@ contract EEEngineTest is Test {
 
     modifier ownerAddIpfsHash() {
         vm.prank(owner);
-        engine.addIpfsImageHash(IPFS_HASH);
+        engine.addIpfsImageHashForAccountNft(IPFS_HASH);
         _;
     }
 
