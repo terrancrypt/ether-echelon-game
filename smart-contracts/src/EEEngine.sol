@@ -19,6 +19,8 @@ contract EEEngine is Ownable {
     error EEEngine_TokenIdInvalid();
     error EEEngine_InputNotMatchLength();
     error EEEngine_TokenPriceHasNotSet();
+    error EEEngine_InsufficientBalance();
+    error EEEngine_BeastCannotEvolve();
 
     IERC6551Registry private immutable i_erc6551Registry;
     AccountNFT private immutable i_account;
@@ -84,6 +86,12 @@ contract EEEngine is Ownable {
     ///////////////////////////////
     event GameAssetPriceChanged(uint256 indexed tokenId, uint256 price);
     event MultipleGameAssetPriceChanged(uint256[] tokenIds, uint256[] prices);
+    event BeastEvolveInforSetted(
+        uint256 beastId,
+        uint256 toBeastId,
+        uint256 conditionId
+    );
+    event BeastEvolved(uint256 indexed fromBeastId, uint256 indexed toBeastId);
 
     ///////////////////////////////////////////////////
     // ========== Owner's Function Inherited ==========
@@ -156,7 +164,40 @@ contract EEEngine is Ownable {
         emit MultipleGameAssetPriceChanged(_tokenIds, prices);
     }
 
-    // function setBeastCanEvolveToAnother(uint256 _tokenId)
+    function setBeastCanEvolveToAnother(
+        uint256 _beastTokenId,
+        uint256 _envolveToId,
+        uint256 conditionAssetId
+    ) public onlyOwner {
+        bool isBeastIdExists = i_gameAssets.getIsTokenExists(_beastTokenId);
+        if (!isBeastIdExists) {
+            revert EEEngine_TokenIdInvalid();
+        }
+
+        bool isEnvolveToIdExists = i_gameAssets.getIsTokenExists(_envolveToId);
+        if (!isEnvolveToIdExists) {
+            revert EEEngine_TokenIdInvalid();
+        }
+
+        bool isConditionAssetId = i_gameAssets.getIsTokenExists(
+            conditionAssetId
+        );
+        if (!isConditionAssetId) {
+            revert EEEngine_TokenIdInvalid();
+        }
+
+        s_beastIdToEvolveInfor[_beastTokenId] = EvolveInfor({
+            evolutionable: true,
+            evolveToBeastId: _envolveToId,
+            conditionAssetId: conditionAssetId
+        });
+
+        emit BeastEvolveInforSetted(
+            _beastTokenId,
+            _envolveToId,
+            conditionAssetId
+        );
+    }
 
     /////////////////////////////////////////
     // ========== Public Functions ==========
@@ -181,7 +222,7 @@ contract EEEngine is Ownable {
 
         s_tokenIdToAddress[accountId] = accountAddr;
 
-        return accountAddr;
+        return payable(accountAddr);
     }
 
     /// @notice This variable allows users (or players) to mint their game assets in the game, by buying them with Ether Echelon Tokens or minting them for free because there will be assets priced at 0.
@@ -201,8 +242,6 @@ contract EEEngine is Ownable {
         uint256 price = getGameAssetPrice(_tokenId);
         uint256 totalPrice = price * _amount;
 
-        i_etherEchelonToken.safeIncreaseAllowance(address(this), totalPrice);
-
         i_etherEchelonToken.safeTransferFrom(
             msg.sender,
             address(this),
@@ -210,6 +249,44 @@ contract EEEngine is Ownable {
         );
 
         _mintGameAssets(account, _tokenId, _amount, "");
+    }
+
+    function evolveBeast(address account, uint256 _beastIdForEvolve) public {
+        bool isBeastIsExists = i_gameAssets.getIsTokenExists(_beastIdForEvolve);
+        if (!isBeastIsExists) {
+            revert EEEngine_TokenIdInvalid();
+        }
+
+        uint256 userBeastBalance = i_gameAssets.balanceOf(
+            account,
+            _beastIdForEvolve
+        );
+        if (userBeastBalance <= 0) {
+            revert EEEngine_InsufficientBalance();
+        }
+
+        EvolveInfor memory evolveInfor = getBeastEnvolveInfor(
+            _beastIdForEvolve
+        );
+
+        if (evolveInfor.evolutionable == false) {
+            revert EEEngine_BeastCannotEvolve();
+        }
+
+        uint256 conditionAssetBalance = i_gameAssets.balanceOf(
+            account,
+            evolveInfor.conditionAssetId
+        );
+
+        if (conditionAssetBalance <= 0) {
+            revert EEEngine_InsufficientBalance();
+        }
+
+        _burnGameAssets(account, _beastIdForEvolve, 1);
+        _burnGameAssets(account, evolveInfor.conditionAssetId, 1);
+        _mintGameAssets(account, evolveInfor.evolveToBeastId, 1, "");
+
+        emit BeastEvolved(_beastIdForEvolve, evolveInfor.evolveToBeastId);
     }
 
     ////////////////////////////////////////////
@@ -221,6 +298,14 @@ contract EEEngine is Ownable {
         uint256 amount
     ) internal {
         i_gameAssets.burn(account, _tokenId, amount);
+    }
+
+    function _burnBatchGameAssets(
+        address account,
+        uint256[] memory tokenIds,
+        uint256[] memory amounts
+    ) internal {
+        i_gameAssets.burnBatch(account, tokenIds, amounts);
     }
 
     function _mintGameAssets(
@@ -251,5 +336,11 @@ contract EEEngine is Ownable {
             prices[i] = s_tokenToPrice[tokenId];
         }
         return (tokenIds, prices);
+    }
+
+    function getBeastEnvolveInfor(
+        uint256 _tokenId
+    ) public view returns (EvolveInfor memory) {
+        return s_beastIdToEvolveInfor[_tokenId];
     }
 }
