@@ -2,6 +2,7 @@
 pragma solidity 0.8.21;
 
 import {Test, console} from "forge-std/Test.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import "src/erc6551/ERC6551Account.sol";
 import "src/erc6551/ERC6551Registry.sol";
 import "src/interfaces/IERC6551Registry.sol";
@@ -9,7 +10,7 @@ import "src/interfaces/IERC6551Account.sol";
 import "src/nft/AccountNFT.sol";
 import "src/nft/GameAssetsNFT.sol";
 import "src/EEEngine.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import "src/token/EEG.sol";
 
 contract EEEngineTest is Test {
     ERC6551Account implementation;
@@ -17,25 +18,35 @@ contract EEEngineTest is Test {
     AccountNFT accountNft;
     GameAssetsNFT gameAssetsNft;
     EEEngine engine;
+    EEG etherEchelonToken;
 
     address owner = makeAddr("owner");
     address user1 = makeAddr("user1");
 
     string constant USER_NAME = "ExampleUsername";
     uint256 constant TOKEN_ACCOUNT_ID_1 = 0;
-    string constant IPFS_HASH =
+    string constant IPFS_HASH_ACCOUNT =
         "QmcRHkTHX7zAJq9aKrLBrEvWyDeuUxyvXsQ6YaEfyZ2TRA";
+    string constant IPFS_HASH_ASSETS = "ExampleHash";
+
+    // Token Game Assets
+    uint256 constant TOKEN_ID_GAME_ASSETS = 101000;
+    uint256[] MULTI_TOKEN_ID_GAME_ASSETS = [101000, 101001, 101003];
+    uint256 constant GAME_ASSETS_PRICE_1 = 10e18;
+    uint256[] MULTI_GAME_ASSETS_PRICE = [10e18, 20e18, 100e18];
 
     function setUp() external {
         accountNft = new AccountNFT(owner);
         implementation = new ERC6551Account();
         registry = new ERC6551Registry(owner, accountNft, implementation);
-        gameAssetsNft = new GameAssetsNFT(owner, IPFS_HASH);
+        gameAssetsNft = new GameAssetsNFT(owner, IPFS_HASH_ASSETS);
+        etherEchelonToken = new EEG();
         engine = new EEEngine(
             owner,
             address(registry),
             address(accountNft),
-            address(gameAssetsNft)
+            address(gameAssetsNft),
+            address(etherEchelonToken)
         );
         vm.startPrank(owner);
         accountNft.transferOwnership(address(engine));
@@ -46,17 +57,100 @@ contract EEEngineTest is Test {
 
     modifier ownerAddIpfsHash() {
         vm.prank(owner);
-        engine.addIpfsImageHashForAccountNft(IPFS_HASH);
+        engine.addIpfsImageHashForAccountNft(IPFS_HASH_ACCOUNT);
+        _;
+    }
+
+    modifier ownerAddGameAssetId() {
+        vm.prank(owner);
+        engine.addSingleTokenIdForGameAssets(TOKEN_ID_GAME_ASSETS);
+        _;
+    }
+
+    modifier ownerAddMultipleGameAssetId() {
+        vm.prank(owner);
+        engine.addMultipleTokenIdsGameAssets(MULTI_TOKEN_ID_GAME_ASSETS);
         _;
     }
 
     // ========== Test Owner Functions =========
-    function test_canAddIpfsHash() public ownerAddIpfsHash {
+    function test_revertAddImageIfNotOwner() public {
+        vm.expectRevert();
+        engine.addIpfsImageHashForAccountNft(IPFS_HASH_ACCOUNT);
+    }
+
+    function test_canAddIpfsHashForAccount() public ownerAddIpfsHash {
         string memory ipfsHash = accountNft.getIpfsImageHashById(
             TOKEN_ACCOUNT_ID_1
         );
 
-        assertEq(ipfsHash, IPFS_HASH);
+        assertEq(ipfsHash, IPFS_HASH_ACCOUNT);
+    }
+
+    function test_canSetUpIfpsHashForGameAssets() public {
+        vm.prank(owner);
+        engine.setUpIfpsHashForGameAssets(IPFS_HASH_ASSETS);
+
+        string memory expectedUri = string(
+            abi.encodePacked(
+                "https://ipfs.io/ipfs/",
+                IPFS_HASH_ASSETS,
+                "/",
+                "metadata.json"
+            )
+        );
+
+        string memory actualUri = gameAssetsNft.contractURI();
+        assertEq(expectedUri, actualUri);
+    }
+
+    function test_canAddSingleTokenIdForGameAssets() public {
+        vm.prank(owner);
+        engine.addSingleTokenIdForGameAssets(TOKEN_ID_GAME_ASSETS);
+
+        bool checkTokenExists = gameAssetsNft.getIsTokenExists(
+            TOKEN_ID_GAME_ASSETS
+        );
+
+        assertEq(checkTokenExists, true);
+    }
+
+    function test_canAddMultipleTokenIdsGameAssets() public {
+        vm.prank(owner);
+        engine.addMultipleTokenIdsGameAssets(MULTI_TOKEN_ID_GAME_ASSETS);
+
+        for (uint256 i; i < MULTI_TOKEN_ID_GAME_ASSETS.length; i++) {
+            uint256 tokenId = MULTI_TOKEN_ID_GAME_ASSETS[i];
+
+            bool checkTokenExists = gameAssetsNft.getIsTokenExists(tokenId);
+            assertEq(checkTokenExists, true);
+        }
+    }
+
+    function test_canSetGameAssetPrice() public ownerAddGameAssetId {
+        vm.prank(owner);
+        engine.setGameAssetPrice(TOKEN_ID_GAME_ASSETS, GAME_ASSETS_PRICE_1);
+
+        uint256 expectedPrice = engine.getGameAssetPrice(TOKEN_ID_GAME_ASSETS);
+
+        assertEq(expectedPrice, GAME_ASSETS_PRICE_1);
+    }
+
+    function test_canSetMultipleGameAssetPrice()
+        public
+        ownerAddMultipleGameAssetId
+    {
+        vm.prank(owner);
+        engine.setMultipleGameAssetPrice(
+            MULTI_TOKEN_ID_GAME_ASSETS,
+            MULTI_GAME_ASSETS_PRICE
+        );
+
+        (uint256[] memory tokenIds, uint256[] memory prices) = engine
+            .getMultipleGameAssetsPrices(MULTI_TOKEN_ID_GAME_ASSETS);
+
+        assertEq(MULTI_TOKEN_ID_GAME_ASSETS, tokenIds);
+        assertEq(MULTI_GAME_ASSETS_PRICE, prices);
     }
 
     // ========== Test Create Account ==========
@@ -71,7 +165,7 @@ contract EEEngineTest is Test {
 
         AccountNFT.AccountInfor memory accInfo = AccountNFT.AccountInfor({
             username: USER_NAME,
-            ipfsImageHash: IPFS_HASH
+            ipfsImageHash: IPFS_HASH_ACCOUNT
         });
 
         vm.prank(user1);
@@ -91,7 +185,7 @@ contract EEEngineTest is Test {
                         '{"name": "',
                         tokenName,
                         '", "image": "https://ipfs.io/ipfs/',
-                        IPFS_HASH,
+                        IPFS_HASH_ACCOUNT,
                         '", "userName": "',
                         USER_NAME,
                         '", "accountAddr": "',
