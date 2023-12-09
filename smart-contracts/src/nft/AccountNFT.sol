@@ -164,4 +164,10 @@ contract AccountNFT is ERC721, Ownable {
 
         return arrIpfsHash;
     }
+
+    function getAccountAddrById(
+        uint256 _tokenId
+    ) public view returns (address) {
+        return s_tokenIdToAddr[_tokenId];
+    }
 }

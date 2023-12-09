@@ -17,15 +17,24 @@ import {IERC6551Registry} from "src/interfaces/IERC6551Registry.sol";
 /// @author Terrancrypt
 /// @notice This Contract Engine inherits from all other contracts in the Ether Echelon Game application to run everything centrally into a single contract for both owner and user. This only supports hackathons and there will definitely be changes in the future.
 contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
+    /////////////////////////////
+    // ========== Type ==========
+    /////////////////////////////
     using SafeERC20 for EEG;
 
+    ///////////////////////////////
+    // ========== Errors ==========
+    ///////////////////////////////
     error EEEngine_AddressAlreadyExists();
     error EEEngine_TokenIdInvalid();
+    error EEEngine_MustBeOwner();
     error EEEngine_MustNotBeZero();
     error EEEngine_InvalidArray();
     error EEEngine_InputNotMatchLength();
     error EEEngine_TokenPriceHasNotSet();
     error EEEngine_InsufficientBalance();
+    error EEEngine_StartingBeastReceived();
+    error EEEngine_NotStartingBeast();
     error EEEngine_BeastCannotEvolve();
     error EEEngine_NotAnEgg();
     error EEEngine_EggAlreadyIncubated();
@@ -34,16 +43,22 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
     error EEEngine_NumberItemsInChestNotSet();
     error EEEngine_VrfRequestInvalid();
 
+    ////////////////////////////////////////
+    // ========== State Variables ==========
+    ////////////////////////////////////////
     IERC6551Registry private immutable i_erc6551Registry;
     AccountNFT private immutable i_account;
     GameAssetsNFT private immutable i_gameAssets;
     EEG private immutable i_etherEchelonToken;
 
-    mapping(uint256 tokenId => address erc6551Address)
-        private s_tokenIdToAddress;
-
     /// @dev This variable helps store the Id token of the game Assets corresponding to its pre-stored value.
     mapping(uint256 gameAssetsId => uint256 price) private s_tokenToPrice;
+
+    mapping(uint256 beastId => bool isStartingBeast) private s_isStartingBeast;
+
+    /// @dev This variable helps determine whether an nft account with tokenid has received their starting beast or not?
+    mapping(uint256 tokenId => bool isReveiveBeast)
+        private s_tokenIdReveivedBeast;
 
     /// @dev This variable checks whether the tokenId of a Game Assets NFT has the owner set a price for it? Without this variable the user can mint an NFT that has not yet had a price set.
     mapping(uint256 gameAssetsId => bool hasSetPrice)
@@ -86,30 +101,7 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
         private s_isEggIncubated;
     mapping(address account => mapping(uint256 eggId => uint256 incubationTimeStart))
         private s_incubatedInfor;
-
     mapping(uint256 tokenId => bool isEgg) private s_isEgg;
-
-    ////////////////////////////////////
-    // ========== Constructor ==========
-    ////////////////////////////////////
-    constructor(
-        address initialOwner,
-        address erc6551Registry,
-        address accountNftAddress,
-        address gameAssetsAddress,
-        address etherEchelonToken,
-        uint64 vrfSubscriptionId,
-        address vrfCoordinator,
-        bytes32 vrfKeyHash
-    ) Ownable(initialOwner) VRFConsumerBaseV2(vrfCoordinator) {
-        i_erc6551Registry = IERC6551Registry(erc6551Registry);
-        i_account = AccountNFT(accountNftAddress);
-        i_gameAssets = GameAssetsNFT(gameAssetsAddress);
-        i_etherEchelonToken = EEG(etherEchelonToken);
-        s_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinator);
-        s_vrfSubscriptionId = vrfSubscriptionId;
-        s_vrfKeyHash = vrfKeyHash;
-    }
 
     ///////////////////////////////
     // ========== Events ==========
@@ -121,6 +113,12 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
     );
     event GameAssetPriceChanged(uint256 indexed tokenId, uint256 price);
     event MultipleGameAssetPriceChanged(uint256[] tokenIds, uint256[] prices);
+    event StartingBeastSetted(uint256 beastId, bool isStartingBeast);
+    event StartingBeastReceived(
+        uint256 accountTokenId,
+        address accountAddr,
+        uint256 indexed beastId
+    );
     event BeastEvolveInforSetted(
         uint256 beastId,
         uint256 toBeastId,
@@ -154,6 +152,28 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
         uint256 indexed chestId,
         uint256 gameAssetId
     );
+
+    ////////////////////////////////////
+    // ========== Constructor ==========
+    ////////////////////////////////////
+    constructor(
+        address initialOwner,
+        address erc6551Registry,
+        address accountNftAddress,
+        address gameAssetsAddress,
+        address etherEchelonToken,
+        uint64 vrfSubscriptionId,
+        address vrfCoordinator,
+        bytes32 vrfKeyHash
+    ) Ownable(initialOwner) VRFConsumerBaseV2(vrfCoordinator) {
+        i_erc6551Registry = IERC6551Registry(erc6551Registry);
+        i_account = AccountNFT(accountNftAddress);
+        i_gameAssets = GameAssetsNFT(gameAssetsAddress);
+        i_etherEchelonToken = EEG(etherEchelonToken);
+        s_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinator);
+        s_vrfSubscriptionId = vrfSubscriptionId;
+        s_vrfKeyHash = vrfKeyHash;
+    }
 
     ///////////////////////////////////////////////////
     // ========== Owner's Function Inherited ==========
@@ -207,6 +227,15 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
         bool _state
     ) public onlyOwner {
         i_gameAssets.updateTokenState(_tokenId, _state);
+    }
+
+    function setStartingBeast(
+        uint256 _beastId,
+        bool isStartingBeast
+    ) public onlyOwner {
+        s_isStartingBeast[_beastId] = isStartingBeast;
+
+        emit StartingBeastSetted(_beastId, isStartingBeast);
     }
 
     /// @dev This function helps set the value of a game asset id, every item in the game has a value (purchased with ether echelon token - EEG.sol contract). Even if the item has a price = 0, it must be set up first before it can be minted.
@@ -375,12 +404,37 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
 
         i_account.updateAddrForAccount(accountId, accountAddr);
 
-        s_tokenIdToAddress[accountId] = accountAddr;
-
         return payable(accountAddr);
     }
 
-    /// @notice This variable allows users (or players) to mint their game assets in the game, by buying them with Ether Echelon Tokens or minting them for free because there will be assets priced at 0.
+    function receiveStartingBeast(uint256 _tokenId, uint256 _beastId) public {
+        if (i_account.ownerOf(_tokenId) != msg.sender) {
+            revert EEEngine_MustBeOwner();
+        }
+
+        if (s_tokenIdReveivedBeast[_tokenId] == true) {
+            revert EEEngine_StartingBeastReceived();
+        }
+
+        bool isBeastIdExists = i_gameAssets.getIsTokenExists(_beastId);
+        if (!isBeastIdExists) {
+            revert EEEngine_TokenIdInvalid();
+        }
+
+        if (s_isStartingBeast[_beastId] == false) {
+            revert EEEngine_NotStartingBeast();
+        }
+
+        address account = i_account.getAccountAddrById(_tokenId);
+
+        s_tokenIdReveivedBeast[_tokenId] = true;
+
+        _mintGameAssets(account, _beastId, 1, "");
+
+        emit StartingBeastReceived(_tokenId, account, _beastId);
+    }
+
+    /// @notice This function allows users (or players) to mint their game assets in the game, by buying them with Ether Echelon Tokens or minting them for free because there will be assets priced at 0.
     function mintGameAssets(
         address account,
         uint256 _tokenId,

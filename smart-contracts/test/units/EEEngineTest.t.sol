@@ -172,6 +172,11 @@ contract EEEngineTest is Test {
         }
     }
 
+    function test_canSetStartingBeast() public ownerAddGameAssetId {
+        vm.prank(owner);
+        engine.setStartingBeast(TOKEN_ID_GAME_ASSETS, true);
+    }
+
     function test_canSetGameAssetPrice() public ownerAddGameAssetId {
         vm.prank(owner);
         engine.setGameAssetPrice(TOKEN_ID_GAME_ASSETS, GAME_ASSETS_PRICE_1);
@@ -352,6 +357,57 @@ contract EEEngineTest is Test {
 
         assertEq(balanceOfAccount, 0);
         assertEq(balanceOfUser1, 1);
+    }
+
+    // ========== Test Reveive Starting Beast ==========
+    function test_userCanReceiveTheirStartingBeast()
+        public
+        ownerAddIpfsHashForAccountNft
+        ownerAddMultipleGameAssetId
+    {
+        vm.prank(owner);
+        engine.setStartingBeast(TOKEN_ID_GAME_ASSETS, true);
+        vm.startPrank(user1);
+        address accountAddr = _userCreateAnAccountNft();
+        engine.receiveStartingBeast(TOKEN_ACCOUNT_ID_1, TOKEN_ID_GAME_ASSETS);
+        vm.stopPrank();
+
+        uint256 balanceOfAccount = gameAssetsNft.balanceOf(
+            accountAddr,
+            TOKEN_ID_GAME_ASSETS
+        );
+
+        assertEq(balanceOfAccount, 1);
+    }
+
+    function test_revertReceiveBeastIfReveived()
+        public
+        ownerAddIpfsHashForAccountNft
+        ownerAddMultipleGameAssetId
+    {
+        vm.prank(owner);
+        engine.setStartingBeast(TOKEN_ID_GAME_ASSETS, true);
+        vm.startPrank(user1);
+        _userCreateAnAccountNft();
+        engine.receiveStartingBeast(TOKEN_ACCOUNT_ID_1, TOKEN_ID_GAME_ASSETS);
+        vm.expectRevert(EEEngine.EEEngine_StartingBeastReceived.selector);
+        engine.receiveStartingBeast(TOKEN_ACCOUNT_ID_1, TOKEN_ID_GAME_ASSETS);
+        vm.stopPrank();
+    }
+
+    function test_revertReveiveBeastIfNotTokenOwner()
+        public
+        ownerAddIpfsHashForAccountNft
+        ownerAddMultipleGameAssetId
+    {
+        vm.prank(owner);
+        engine.setStartingBeast(TOKEN_ID_GAME_ASSETS, true);
+        vm.startPrank(user1);
+        _userCreateAnAccountNft();
+        vm.stopPrank();
+
+        vm.expectRevert(EEEngine.EEEngine_MustBeOwner.selector);
+        engine.receiveStartingBeast(TOKEN_ACCOUNT_ID_1, TOKEN_ID_GAME_ASSETS);
     }
 
     // ========== Game Assets Minting & Transfer Test =========
@@ -634,47 +690,6 @@ contract EEEngineTest is Test {
 
     // ========== Fork Test Open Chest With Chainlink VRF ==========
 
-    // function test_canOpenChest() public {
-    //     uint256[] memory gameAssetsIdForAdd = new uint256[](6);
-    //     gameAssetsIdForAdd[0] = 103000;
-    //     gameAssetsIdForAdd[1] = 102000;
-    //     gameAssetsIdForAdd[2] = 102001;
-    //     gameAssetsIdForAdd[3] = 102002;
-    //     gameAssetsIdForAdd[4] = 102003;
-    //     gameAssetsIdForAdd[5] = 102004;
-
-    //     uint256 chestId = 103000;
-    //     uint32 numberItemsInChest = 5;
-    //     uint256[] memory gameAssetsArrInChest = new uint256[](5);
-    //     gameAssetsArrInChest[0] = 102000;
-    //     gameAssetsArrInChest[1] = 102001;
-    //     gameAssetsArrInChest[2] = 102002;
-    //     gameAssetsArrInChest[3] = 102003;
-    //     gameAssetsArrInChest[4] = 102004;
-
-    //     vm.startPrank(forkOwner);
-    //     engine.addIpfsImageHashForAccountNft(IPFS_HASH_ACCOUNT);
-    //     engine.addMultipleTokenIdsGameAssets(gameAssetsIdForAdd);
-    //     engine.setGameAssetPrice(chestId, GAME_ASSETS_PRICE_1);
-    //     engine.setNumberItemsInChest(numberItemsInChest);
-    //     engine.setChestInfor(chestId, gameAssetsArrInChest);
-    //     vm.stopPrank();
-
-    //     address forkUser = makeAddr("forkUser");
-    //     vm.startPrank(forkUser);
-    //     address accountAddr = _userCreateAnAccountNft();
-    //     etherEchelonToken.faucet();
-    //     etherEchelonToken.approve(address(engine), GAME_ASSETS_PRICE_1);
-    //     engine.mintGameAssets(accountAddr, chestId, 1);
-    //     ERC6551Account(payable(accountAddr)).safeApproveERC1155(
-    //         address(gameAssetsNft),
-    //         address(engine),
-    //         true
-    //     );
-    //     engine.openChest(accountAddr, chestId);
-    //     vm.stopPrank();
-    // }
-
     function test_canOpenChest() public {
         uint256[] memory gameAssetsIdForAdd = new uint256[](6);
         gameAssetsIdForAdd[0] = 103000;
@@ -774,31 +789,4 @@ contract EEEngineTest is Test {
         address accountAddr = engine.createAccount(accInfo);
         return accountAddr;
     }
-
-    // function _setUpForkTest() internal returns (address) {
-    //     address forkOwner = makeAddr("fork owner");
-
-    //     accountNft = new AccountNFT(forkOwner);
-    //     implementation = new ERC6551Account();
-    //     registry = new ERC6551Registry(forkOwner, accountNft, implementation);
-    //     gameAssetsNft = new GameAssetsNFT(forkOwner, IPFS_HASH_ASSETS);
-    //     etherEchelonToken = new EEG();
-    //     engine = new EEEngine(
-    //         forkOwner,
-    //         address(registry),
-    //         address(accountNft),
-    //         address(gameAssetsNft),
-    //         address(etherEchelonToken),
-    //         VRF_SUBSCRIPTION_ID,
-    //         VRF_COORDINATOR_MUMBAI,
-    //         VRF_KEY_HASH_MUMBAI
-    //     );
-    //     vm.startPrank(forkOwner);
-    //     accountNft.transferOwnership(address(engine));
-    //     registry.transferOwnership(address(engine));
-    //     gameAssetsNft.transferOwnership(address(engine));
-    //     vm.stopPrank();
-
-    //     return forkOwner;
-    // }
 }
