@@ -6,13 +6,15 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {AccountNFT} from "src/nft/AccountNFT.sol";
 import {GameAssetsNFT} from "src/nft/GameAssetsNFT.sol";
 import {IERC6551Registry} from "src/interfaces/IERC6551Registry.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IERC1155Receiver} from "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 import {EEG} from "src/token/EEG.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /// @title Eche Echelon Engine Contract
 /// @author Terrancrypt
 /// @notice This Contract Engine inherits from all other contracts in the Ether Echelon Game application to run everything centrally into a single contract for both owner and user. This only supports hackathons and there will definitely be changes in the future.
-contract EEEngine is Ownable {
+contract EEEngine is Ownable, IERC165, IERC1155Receiver {
     using SafeERC20 for EEG;
 
     error EEEngine_AddressAlreadyExists();
@@ -21,6 +23,10 @@ contract EEEngine is Ownable {
     error EEEngine_TokenPriceHasNotSet();
     error EEEngine_InsufficientBalance();
     error EEEngine_BeastCannotEvolve();
+    error EEEngine_NotAnEgg();
+    error EEEngine_EggAlreadyIncubated();
+    error EEEngine_EggNotIncubate();
+    error EEEngine_EggCannotHatch();
 
     IERC6551Registry private immutable i_erc6551Registry;
     AccountNFT private immutable i_account;
@@ -60,14 +66,16 @@ contract EEEngine is Ownable {
         uint256 incubateToBeastId;
     }
     mapping(uint256 eggId => IncubateInfor) private s_eggToIncubateInfor;
+    mapping(address account => mapping(uint256 eggId => bool isIncubated))
+        private s_isEggIncubated;
+    mapping(address account => mapping(uint256 eggId => uint256 incubationTimeStart))
+        private s_incubatedInfor;
 
-    mapping(address account => mapping(uint256 eggId => uint256 incubationStartTime))
-        private s_IncubateInfor;
+    mapping(uint256 tokenId => bool isEgg) private s_isEgg;
 
     ////////////////////////////////////
     // ========== Constructor ==========
     ////////////////////////////////////
-
     constructor(
         address initialOwner,
         address erc6551Registry,
@@ -91,7 +99,22 @@ contract EEEngine is Ownable {
         uint256 toBeastId,
         uint256 conditionId
     );
+    event EggIncubateInforSetted(
+        uint256 indexed eggId,
+        uint256 indexed incubateToBeastId,
+        uint256 hatchingTime
+    );
     event BeastEvolved(uint256 indexed fromBeastId, uint256 indexed toBeastId);
+    event EggIncubated(
+        address account,
+        uint256 indexed eggId,
+        uint256 timeStart
+    );
+    event EggHatched(
+        address indexed account,
+        uint256 indexed eggId,
+        uint256 indexed beastId
+    );
 
     ///////////////////////////////////////////////////
     // ========== Owner's Function Inherited ==========
@@ -164,7 +187,7 @@ contract EEEngine is Ownable {
         emit MultipleGameAssetPriceChanged(_tokenIds, prices);
     }
 
-    function setBeastCanEvolveToAnother(
+    function setBeastEvolveInfor(
         uint256 _beastTokenId,
         uint256 _envolveToId,
         uint256 conditionAssetId
@@ -197,6 +220,32 @@ contract EEEngine is Ownable {
             _envolveToId,
             conditionAssetId
         );
+    }
+
+    function setEggIncubateInfor(
+        uint256 _eggId,
+        uint256 _incubateToBeastId,
+        uint256 _hatchingTime // in seconds
+    ) public onlyOwner {
+        bool isEggIdExists = i_gameAssets.getIsTokenExists(_eggId);
+        if (!isEggIdExists) {
+            revert EEEngine_TokenIdInvalid();
+        }
+
+        bool isBeastIdExists = i_gameAssets.getIsTokenExists(
+            _incubateToBeastId
+        );
+        if (!isBeastIdExists) {
+            revert EEEngine_TokenIdInvalid();
+        }
+
+        s_eggToIncubateInfor[_eggId] = IncubateInfor({
+            hatchingTime: _hatchingTime,
+            incubateToBeastId: _incubateToBeastId
+        });
+        s_isEgg[_eggId] = true;
+
+        emit EggIncubateInforSetted(_eggId, _hatchingTime, _incubateToBeastId);
     }
 
     /////////////////////////////////////////
@@ -289,6 +338,49 @@ contract EEEngine is Ownable {
         emit BeastEvolved(_beastIdForEvolve, evolveInfor.evolveToBeastId);
     }
 
+    function incubateAnEgg(address account, uint256 _eggId) public {
+        bool isEggIdExists = i_gameAssets.getIsTokenExists(_eggId);
+        uint256 balanceEgg = i_gameAssets.balanceOf(account, _eggId);
+        if (!isEggIdExists) {
+            revert EEEngine_TokenIdInvalid();
+        }
+        if (s_isEgg[_eggId] == false) {
+            revert EEEngine_NotAnEgg();
+        }
+        if (balanceEgg <= 0) {
+            revert EEEngine_InsufficientBalance();
+        }
+        if (s_isEggIncubated[account][_eggId] == true) {
+            revert EEEngine_EggAlreadyIncubated();
+        }
+
+        i_gameAssets.safeTransferFrom(account, address(this), _eggId, 1, "");
+
+        s_isEggIncubated[account][_eggId] = true;
+        s_incubatedInfor[account][_eggId] = block.timestamp;
+
+        emit EggIncubated(account, _eggId, block.timestamp);
+    }
+
+    function hatchEgg(address account, uint256 _eggId) public {
+        if (s_isEggIncubated[account][_eggId] == false) {
+            revert EEEngine_EggNotIncubate();
+        }
+
+        if (s_isEgg[_eggId] == false) {
+            revert EEEngine_NotAnEgg();
+        }
+
+        (bool canHatch, uint256 beastId) = _checkEggCanHatch(account, _eggId);
+
+        if (!canHatch) revert EEEngine_EggCannotHatch();
+
+        _burnGameAssets(address(this), _eggId, 1);
+        _mintGameAssets(account, beastId, 1, "");
+
+        emit EggHatched(account, _eggId, beastId);
+    }
+
     ////////////////////////////////////////////
     // ========== Internal Functions ===========
     ////////////////////////////////////////////
@@ -317,6 +409,55 @@ contract EEEngine is Ownable {
         i_gameAssets.mint(to, tokenId, amount, data);
     }
 
+    function _checkEggCanHatch(
+        address account,
+        uint256 _eggId
+    ) internal view returns (bool canHatch, uint256 beastId) {
+        IncubateInfor memory incubateInfor = s_eggToIncubateInfor[_eggId];
+
+        uint256 startTime = getEggIncubatedStartTime(account, _eggId);
+
+        uint256 timePast = block.timestamp - startTime;
+
+        if (timePast >= incubateInfor.hatchingTime) {
+            canHatch = true;
+            beastId = incubateInfor.incubateToBeastId;
+        } else {
+            canHatch = false;
+        }
+
+        return (canHatch, beastId);
+    }
+
+    /////////////////////////////////////////
+    // ========== ERC1155 Receiver ==========
+    /////////////////////////////////////////
+    function onERC1155Received(
+        address,
+        address,
+        uint256,
+        uint256,
+        bytes memory
+    ) public virtual override returns (bytes4) {
+        return this.onERC1155Received.selector;
+    }
+
+    function onERC1155BatchReceived(
+        address,
+        address,
+        uint256[] memory,
+        uint256[] memory,
+        bytes memory
+    ) public virtual override returns (bytes4) {
+        return this.onERC1155BatchReceived.selector;
+    }
+
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public pure override returns (bool) {
+        return interfaceId == type(IERC165).interfaceId;
+    }
+
     ///////////////////////////////////////////////////////
     // ========== Public View / Getter Functions ==========
     ///////////////////////////////////////////////////////
@@ -342,5 +483,18 @@ contract EEEngine is Ownable {
         uint256 _tokenId
     ) public view returns (EvolveInfor memory) {
         return s_beastIdToEvolveInfor[_tokenId];
+    }
+
+    function getEggIncubateInfor(
+        uint256 _tokenId
+    ) public view returns (IncubateInfor memory) {
+        return s_eggToIncubateInfor[_tokenId];
+    }
+
+    function getEggIncubatedStartTime(
+        address account,
+        uint256 _tokenId
+    ) public view returns (uint256) {
+        return s_incubatedInfor[account][_tokenId];
     }
 }

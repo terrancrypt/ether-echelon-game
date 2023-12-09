@@ -39,6 +39,9 @@ contract EEEngineTest is Test {
     // Ether Echelon ERC20 Token
     uint256 constant FAUCET_AMOUNT = 100e18;
 
+    // Incubate Infor
+    uint256 constant HATCHING_TIME = 3600; //in miliseconds
+
     function setUp() external {
         accountNft = new AccountNFT(owner);
         implementation = new ERC6551Account();
@@ -77,9 +80,9 @@ contract EEEngineTest is Test {
         _;
     }
 
-    modifier ownerSetBeastEnvolve() {
+    modifier ownerSetBeastEvolve() {
         vm.prank(owner);
-        engine.setBeastCanEvolveToAnother(101000, 101001, 101003);
+        engine.setBeastEvolveInfor(101000, 101001, 101003);
         _;
     }
 
@@ -166,12 +169,9 @@ contract EEEngineTest is Test {
         assertEq(MULTI_GAME_ASSETS_PRICE, prices);
     }
 
-    function test_canSetBeastCanEvolveToAnother()
-        public
-        ownerAddMultipleGameAssetId
-    {
+    function test_canSetBeastEvolveInfor() public ownerAddMultipleGameAssetId {
         vm.prank(owner);
-        engine.setBeastCanEvolveToAnother(101000, 101001, 101003);
+        engine.setBeastEvolveInfor(101000, 101001, 101003);
 
         EEEngine.EvolveInfor memory evolveInfor = engine.getBeastEnvolveInfor(
             101000
@@ -180,6 +180,17 @@ contract EEEngineTest is Test {
         assertTrue(evolveInfor.evolutionable);
         assertEq(evolveInfor.evolveToBeastId, 101001);
         assertEq(evolveInfor.conditionAssetId, 101003);
+    }
+
+    function test_canSetEggIncubateInfor() public ownerAddMultipleGameAssetId {
+        vm.prank(owner);
+        engine.setEggIncubateInfor(101000, 101001, HATCHING_TIME);
+
+        EEEngine.IncubateInfor memory incubateInfor = engine
+            .getEggIncubateInfor(101000);
+
+        assertEq(incubateInfor.hatchingTime, HATCHING_TIME);
+        assertEq(incubateInfor.incubateToBeastId, 101001);
     }
 
     // ========== Test Create Account ==========
@@ -385,6 +396,171 @@ contract EEEngineTest is Test {
         vm.stopPrank();
     }
 
+    // ========== Egg Incubate Test ==========
+    function test_canIncubateAnEgg()
+        public
+        ownerAddIpfsHashForAccountNft
+        ownerAddMultipleGameAssetId
+    {
+        uint256 eggIdForIncubate = 101000;
+        vm.startPrank(owner);
+        engine.setEggIncubateInfor(eggIdForIncubate, 101001, HATCHING_TIME);
+        engine.setGameAssetPrice(eggIdForIncubate, GAME_ASSETS_PRICE_1);
+        vm.stopPrank();
+
+        vm.startPrank(user1);
+        address accountAddr = _userCreateAnAccountNft();
+        etherEchelonToken.faucet();
+        etherEchelonToken.approve(address(engine), GAME_ASSETS_PRICE_1);
+        engine.mintGameAssets(accountAddr, eggIdForIncubate, 1);
+        ERC6551Account(payable(accountAddr)).safeApproveERC1155(
+            address(gameAssetsNft),
+            address(engine),
+            true
+        );
+        vm.warp(1641070800);
+        engine.incubateAnEgg(accountAddr, eggIdForIncubate);
+        vm.stopPrank();
+
+        uint256 eggBalanceOfAccount = gameAssetsNft.balanceOf(
+            accountAddr,
+            eggIdForIncubate
+        );
+
+        assertEq(eggBalanceOfAccount, 0);
+
+        uint256 eggBalanceInEngine = gameAssetsNft.balanceOf(
+            address(engine),
+            eggIdForIncubate
+        );
+
+        assertEq(eggBalanceInEngine, 1);
+
+        uint256 startTime = engine.getEggIncubatedStartTime(
+            accountAddr,
+            eggIdForIncubate
+        );
+
+        assertEq(startTime, 1641070800);
+    }
+
+    function test_canHatchEgg()
+        public
+        ownerAddIpfsHashForAccountNft
+        ownerAddMultipleGameAssetId
+    {
+        uint256 eggIdForIncubate = 101000;
+        vm.startPrank(owner);
+        engine.setEggIncubateInfor(eggIdForIncubate, 101001, HATCHING_TIME);
+        engine.setGameAssetPrice(eggIdForIncubate, GAME_ASSETS_PRICE_1);
+        vm.stopPrank();
+
+        vm.startPrank(user1);
+        address accountAddr = _userCreateAnAccountNft();
+        etherEchelonToken.faucet();
+        etherEchelonToken.approve(address(engine), GAME_ASSETS_PRICE_1);
+        engine.mintGameAssets(accountAddr, eggIdForIncubate, 1);
+        ERC6551Account(payable(accountAddr)).safeApproveERC1155(
+            address(gameAssetsNft),
+            address(engine),
+            true
+        );
+        vm.warp(1641070800);
+        vm.roll(100);
+        engine.incubateAnEgg(accountAddr, eggIdForIncubate);
+        vm.warp(1641070800 + HATCHING_TIME);
+        vm.roll(100);
+        engine.hatchEgg(accountAddr, eggIdForIncubate);
+        vm.stopPrank();
+
+        uint256 eggBalanceInEngine = gameAssetsNft.balanceOf(
+            address(engine),
+            eggIdForIncubate
+        );
+
+        assertEq(eggBalanceInEngine, 0);
+
+        EEEngine.IncubateInfor memory incubateInfor = engine
+            .getEggIncubateInfor(eggIdForIncubate);
+
+        uint256 beastBalanceInAccount = gameAssetsNft.balanceOf(
+            accountAddr,
+            incubateInfor.incubateToBeastId
+        );
+
+        assertEq(beastBalanceInAccount, 1);
+    }
+
+    function test_revertIncubateEggIfEggIdInvalid() public {
+        vm.prank(user1);
+        vm.expectRevert(EEEngine.EEEngine_TokenIdInvalid.selector);
+        engine.incubateAnEgg(user1, 101000);
+    }
+
+    function test_revertIncubateEggIfTokenIdNotEgg()
+        public
+        ownerAddIpfsHashForAccountNft
+        ownerAddMultipleGameAssetId
+    {
+        vm.prank(user1);
+        vm.expectRevert(EEEngine.EEEngine_NotAnEgg.selector);
+        engine.incubateAnEgg(user1, 101001);
+    }
+
+    function test_revertIncubateEggIfBalanceEggInvalid()
+        public
+        ownerAddIpfsHashForAccountNft
+        ownerAddMultipleGameAssetId
+    {
+        uint256 eggIdForIncubate = 101000;
+        vm.startPrank(owner);
+        engine.setEggIncubateInfor(eggIdForIncubate, 101001, HATCHING_TIME);
+        engine.setGameAssetPrice(eggIdForIncubate, GAME_ASSETS_PRICE_1);
+        vm.stopPrank();
+
+        vm.startPrank(user1);
+        address accountAddr = _userCreateAnAccountNft();
+        ERC6551Account(payable(accountAddr)).safeApproveERC1155(
+            address(gameAssetsNft),
+            address(engine),
+            true
+        );
+        vm.expectRevert(EEEngine.EEEngine_InsufficientBalance.selector);
+        engine.incubateAnEgg(user1, eggIdForIncubate);
+        vm.stopPrank();
+    }
+
+    function test_revertHatchEggIfNotEnoughTime()
+        public
+        ownerAddIpfsHashForAccountNft
+        ownerAddMultipleGameAssetId
+    {
+        uint256 eggIdForIncubate = 101000;
+        vm.startPrank(owner);
+        engine.setEggIncubateInfor(eggIdForIncubate, 101001, HATCHING_TIME);
+        engine.setGameAssetPrice(eggIdForIncubate, GAME_ASSETS_PRICE_1);
+        vm.stopPrank();
+
+        vm.startPrank(user1);
+        address accountAddr = _userCreateAnAccountNft();
+        etherEchelonToken.faucet();
+        etherEchelonToken.approve(address(engine), GAME_ASSETS_PRICE_1);
+        engine.mintGameAssets(accountAddr, eggIdForIncubate, 1);
+        ERC6551Account(payable(accountAddr)).safeApproveERC1155(
+            address(gameAssetsNft),
+            address(engine),
+            true
+        );
+        vm.warp(1641070800);
+        vm.roll(100);
+        engine.incubateAnEgg(accountAddr, eggIdForIncubate);
+        vm.warp(1641070800 + 1300);
+        vm.roll(50);
+        vm.expectRevert(EEEngine.EEEngine_EggCannotHatch.selector);
+        engine.hatchEgg(accountAddr, eggIdForIncubate);
+        vm.stopPrank();
+    }
+
     // ========== Helper Internal Test Functions =========
     function _ownerAllSetupForMintAssets() internal {
         vm.startPrank(owner);
@@ -400,7 +576,7 @@ contract EEEngineTest is Test {
         engine.addMultipleTokenIdsGameAssets(MULTI_TOKEN_ID_GAME_ASSETS);
         engine.setGameAssetPrice(101000, GAME_ASSETS_PRICE_1);
         engine.setGameAssetPrice(101003, GAME_ASSETS_PRICE_1);
-        engine.setBeastCanEvolveToAnother(101000, 101001, 101003);
+        engine.setBeastEvolveInfor(101000, 101001, 101003);
         vm.stopPrank();
     }
 
