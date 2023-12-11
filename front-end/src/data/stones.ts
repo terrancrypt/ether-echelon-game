@@ -10,19 +10,19 @@ interface StonesData {
 const stonesData: StonesData = {
   "103000": {
     name: "FireStone",
-    image: "/src/assets/items/stones/FireStone.png",
+    image: "/images/items/stones/FireStone.png",
   },
   "103001": {
     name: "GrassStone",
-    image: "/src/assets/items/stones/GrassStone.png",
+    image: "/images/items/stones/GrassStone.png",
   },
   "103002": {
     name: "WaterStone",
-    image: "/src/assets/items/stones/WaterStone.png",
+    image: "/images/items/stones/WaterStone.png",
   },
   "103003": {
     name: "EarthStone",
-    image: "/src/assets/items/stones/EarthStone.png",
+    image: "/images/items/stones/EarthStone.png",
   },
 };
 

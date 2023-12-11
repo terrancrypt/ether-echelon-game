@@ -105,7 +105,7 @@ class Overworld {
     }
   }
 
-  init(initData: OverworldMapsData) {
+  init(initData: OverworldMapsData, isNewPlayer: boolean) {
     this.startMap(initData.ProfessorHouse);
 
     this.bindActionInput();
@@ -116,14 +116,38 @@ class Overworld {
 
     this.startGameLoop();
 
-    // this.map.startCutscene([
-    //   { who: "npcA", type: "walk", direction: "up" },
-    //   { who: "npcA", type: "stand", direction: "left", time: 800 },
-    //   { who: "player", type: "stand", direction: "right", time: 800 },
-    //   { who: "npcA", type: "textMessage", text: "WHY HELLO THERE!" },
-    // ]);
-
-    // this.map?.startCutscene([{ type: "battle" }]);
+    if (isNewPlayer) {
+      this.map?.startCutscene([
+        { who: "professorNPC", type: "walk", direction: "up" },
+        { who: "professorNPC", type: "walk", direction: "up" },
+        { who: "professorNPC", type: "walk", direction: "left" },
+        { who: "professorNPC", type: "walk", direction: "left" },
+        { who: "professorNPC", type: "walk", direction: "left" },
+        { who: "professorNPC", type: "walk", direction: "down" },
+        { who: "professorNPC", type: "walk", direction: "down" },
+        { who: "professorNPC", type: "walk", direction: "down" },
+        { who: "professorNPC", type: "stand", direction: "down", time: 800 },
+        { who: "player", type: "stand", direction: "up", time: 800 },
+        {
+          who: "professorNPC",
+          type: "textMessage",
+          text: "Welcome to Ether Echelon! I'm Terran!",
+        },
+        {
+          who: "professorNPC",
+          type: "textMessage",
+          text: "You can use the A W S D keys to move!",
+        },
+        { who: "professorNPC", type: "walk", direction: "up" },
+        { who: "professorNPC", type: "walk", direction: "up" },
+        { who: "professorNPC", type: "walk", direction: "up" },
+        { who: "professorNPC", type: "walk", direction: "right" },
+        { who: "professorNPC", type: "walk", direction: "right" },
+        { who: "professorNPC", type: "walk", direction: "right" },
+        { who: "professorNPC", type: "walk", direction: "down" },
+        { who: "professorNPC", type: "walk", direction: "down" },
+      ]);
+    }
   }
 }
 

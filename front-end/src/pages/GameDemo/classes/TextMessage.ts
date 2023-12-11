@@ -27,9 +27,7 @@ class TextMessage {
 
     this.element.innerHTML = `
         <p class="text-message_text"></p>
-        <button class="text-message_button">Next
-        <span>[Enter]</span>
-        </button>
+        <button class="text-message_button">Next [Enter]</button>
       `;
 
     // Init the type writer effect

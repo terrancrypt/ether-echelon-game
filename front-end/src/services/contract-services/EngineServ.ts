@@ -125,6 +125,7 @@ const openChest = async ({
       functionName: "openChest",
       args: [accountAddr, chestId],
     });
+
     return hash;
   } catch (error) {
     console.log(error);

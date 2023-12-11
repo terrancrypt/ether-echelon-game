@@ -129,7 +129,7 @@ const BeastsOf = () => {
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, [isModalVisible, authState]);
+  }, [isModalVisible, authState, messageApi]);
 
   return (
     <>
@@ -141,7 +141,7 @@ const BeastsOf = () => {
             className="hover:scale-105 cursor-pointer bg-white rounded-full w-[20px] h-[20px] flex items-center justify-center"
           >
             <img
-              src="src/assets/gui/Sprite.png"
+              src="images/gui/Sprite.png"
               className="w-[15px] h-[15px]"
               alt=""
             />

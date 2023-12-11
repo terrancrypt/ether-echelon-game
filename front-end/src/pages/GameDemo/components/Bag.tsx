@@ -93,7 +93,7 @@ const Bag = () => {
             if (waitTx) {
               message
                 .success(
-                  "Open chest success! Check your bags and your beastss in a few minutes!"
+                  "Open chest success! Check your bags and your beasts in a few minutes!"
                 )
                 .then(() => messageApi.destroy());
             }
@@ -182,7 +182,7 @@ const Bag = () => {
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, [isModalVisible, authState]);
+  }, [isModalVisible, authState, messageApi]);
 
   return (
     <>
@@ -194,7 +194,7 @@ const Bag = () => {
             className="hover:scale-105 cursor-pointer bg-white rounded-full"
           >
             <img
-              src="src/assets/gui/Backpack.png"
+              src="images/gui/Backpack.png"
               className="w-[20px] h-[20px] "
               alt=""
             />

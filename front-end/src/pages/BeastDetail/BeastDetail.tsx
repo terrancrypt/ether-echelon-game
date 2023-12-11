@@ -49,7 +49,7 @@ const BeastDetail = () => {
           <div className="my-8 space-y-4 px-32">
             <div className="flex justify-normal items-start gap-6">
               <img
-                src={"/" + data.assets.avatar}
+                src={data.assets.avatar}
                 alt={data.name}
                 className="w-20 h-20"
               />

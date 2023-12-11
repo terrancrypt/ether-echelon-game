@@ -14,15 +14,15 @@ interface DataContract {
 
 const dataContract: DataContract = {
   engineContract: {
-    address: "0xb72a747DD945Bb0f5782f3B0E9c4D8b7F40D8ab6",
+    address: "0xe3A64C6ec0CB86C31158EAF01E60dAF85662084C",
     abi: EngineABI,
   },
   accountNftContract: {
-    address: "0x4b9E2d190F88AfAE62558626d8Db036A179221Da",
+    address: "0xeA06E2a7C765270387b44427DB2fD2c47561aaF7",
     abi: AccountNftABI,
   },
   erc6551Registry: {
-    address: "0x477Ce8BFD19BAd8e75c720938cBE9adbC6F5Ff96",
+    address: "0x1F96D347a3E1956b5Ccf504090d934c2CF9D70BC",
     abi: Erc6551RegistryABI,
   },
   erc6551Account: {
@@ -30,11 +30,11 @@ const dataContract: DataContract = {
     abi: Erc6551AccountAbi,
   },
   GameAssetsNFT: {
-    address: "0x0Eb6AC5ccA703239A764713104D24C97e843da23",
+    address: "0x1F501DB21f83BB60Aabaf4D8e44F148C3e53587F",
     abi: GameAssetsNFT,
   },
   EEGToken: {
-    address: "0x536E1C450CBC7008d58d8E80f7e18eeb082D47bA",
+    address: "0xf1Cd83753a2f4aa18462b855ffD0e42f39Ce09d8",
     abi: EEGAbi,
   },
 };

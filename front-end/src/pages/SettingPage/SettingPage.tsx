@@ -1,3 +1,4 @@
+import { message } from "antd";
 import {
   addIpfsImageHashForAccountNft,
   addMultipleTokenIdsGameAssets,
@@ -29,6 +30,7 @@ const SettingPage = () => {
       const ipfsHash = ipfsHashForAccountNft[i];
       await addIpfsImageHashForAccountNft(ipfsHash);
     }
+    message.success("Finish step 1");
   };
 
   // Add Ipfs Hash Folder Metadata for Game Assets
@@ -36,6 +38,7 @@ const SettingPage = () => {
 
   const setUpStep2 = async () => {
     await setUpIfpsHashForGameAssets(ipfsHashFolder);
+    message.success("Finish step 2");
   };
 
   // Add tokenid for game assets to mint
@@ -48,6 +51,7 @@ const SettingPage = () => {
 
   const setUpStep3 = async () => {
     await addMultipleTokenIdsGameAssets(arrTokenIds);
+    message.success("Finish step 3");
   };
 
   const arrTokenIsForSetPrice = [
@@ -84,6 +88,7 @@ const SettingPage = () => {
         arrPricesForSetPrice[i]
       );
     }
+    message.success("Finish step 4");
   };
 
   // Add chest infor
@@ -107,6 +112,7 @@ const SettingPage = () => {
     await setChestInfor(102000, arrNormalChest);
     await setChestInfor(102001, arrRareChest);
     await setChestInfor(102002, arrEpicChest);
+    message.success("Finish step 5");
   };
 
   // Add evolution infor
@@ -125,6 +131,8 @@ const SettingPage = () => {
 
     /// 101019 Tiny Grass Snake + 103001 Grass stone => 101020 Grass snake
     await setBeastEvolveInfor(101019, 101020, 103001);
+
+    message.success("Finish step 6");
   };
 
   // Add egg infor
@@ -137,12 +145,16 @@ const SettingPage = () => {
 
     /// 104002 Demon Owl Egg + Hatching time 900 second (15 minutes) => 101016 Demon Owl
     await setEggIncubateInfor(104002, 101016, 900);
+
+    message.success("Finish step 7");
   };
 
   const setUpStep8 = async () => {
     await setStartingBeast(101000);
     await setStartingBeast(101001);
     await setStartingBeast(101002);
+
+    message.success("Finish step 8");
   };
 
   return (

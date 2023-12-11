@@ -29,6 +29,7 @@ const Incubation = () => {
           (authState as any).accountAddr,
           key
         );
+
         if (isIncubate) {
           const startTime = await getEggIncubatedStartTime(
             (authState as any).accountAddr,
@@ -117,7 +118,7 @@ const Incubation = () => {
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, [isModalVisible, authState]);
+  }, [isModalVisible, authState, messageApi]);
 
   return (
     <>
@@ -129,7 +130,7 @@ const Incubation = () => {
             className="hover:scale-105 cursor-pointer bg-white rounded-full w-[20px] h-[20px] flex items-center justify-center"
           >
             <img
-              src="src/assets/gui/Egg.png"
+              src="images/gui/Egg.png"
               className="w-[15px] h-[15px]"
               alt=""
             />

@@ -86,13 +86,15 @@ const Header = () => {
           <NavLink className="hover:underline" to="/play">
             play
           </NavLink>
+          <NavLink className="hover:underline" to="/how-to-play">
+            how-to-play
+          </NavLink>
           <NavLink className="hover:underline" to="/create-account">
             create-account
           </NavLink>
           <NavLink className="hover:underline" to="/market">
             MARKET
           </NavLink>
-
           <div
             className="relative"
             onMouseEnter={() => setIsHovered(true)}

@@ -33,7 +33,7 @@ interface AccountCreated extends AccountInfor {
 
 const CreateAccountPage: React.FC = () => {
   const [form] = Form.useForm();
-  const { isConnected } = getAccount();
+  const { isConnected, address } = getAccount();
   const [characterImg, setCharacterImg] = useState<CharacterImg | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [txHash, setTxHash] = useState<string | null>(null);
@@ -60,7 +60,8 @@ const CreateAccountPage: React.FC = () => {
       try {
         const storedData = window.localStorage.getItem("userData");
         const userDataArray = storedData ? JSON.parse(storedData) : [];
-
+        const newAccount = localStorage.getItem("newAccount");
+        const newAccountArray = newAccount ? JSON.parse(newAccount) : [];
         const tokenId = formatUnits(log[0].args.tokenId, 0);
 
         const isTokenExists = userDataArray.some(
@@ -77,6 +78,8 @@ const CreateAccountPage: React.FC = () => {
             "userData",
             JSON.stringify(userDataArray)
           );
+          newAccountArray.push(tokenId);
+          localStorage.setItem("newAccount", JSON.stringify(newAccountArray));
           await fetchUserData();
         }
       } catch (error) {
@@ -180,7 +183,7 @@ const CreateAccountPage: React.FC = () => {
 
   useEffect(() => {
     fetchUserData();
-  }, [isConnected]);
+  }, [isConnected, address]);
 
   return (
     <>
@@ -191,8 +194,8 @@ const CreateAccountPage: React.FC = () => {
               <div className="flex flex-col justify-center gap-8">
                 <Spin size="large" />
                 {txHash ? (
-                  <div>
-                    <p className="mb-2">You transaction in progress...</p>
+                  <div className="text-[12px]">
+                    <p className="mb-2">Your transaction in progress...</p>
                     <p>
                       Hash:{" "}
                       <a
@@ -277,7 +280,7 @@ const CreateAccountPage: React.FC = () => {
                     src={
                       characterImg
                         ? characterImg.inGameImg
-                        : "/images/Characters/Undefined.gif"
+                        : "/images/characters/Undefined.gif"
                     }
                     width={300}
                     height={300}
@@ -288,7 +291,7 @@ const CreateAccountPage: React.FC = () => {
                       src={
                         characterImg
                           ? characterImg.avatarImg
-                          : "/images/Characters/Undefined.png"
+                          : "/images/characters/Undefined.png"
                       }
                       width={50}
                       height={50}

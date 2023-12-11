@@ -64,6 +64,10 @@ const LoginGame = () => {
       element: document.querySelector(".game-online-container"),
     });
 
+    const newAccount = localStorage.getItem("newAccount");
+    const newAccountArray = newAccount ? JSON.parse(newAccount) : [];
+    const indexTokenId = newAccountArray.indexOf(tokenId);
+
     Object.keys(initData).forEach((key) => {
       const object = initData[key];
       object.gameObjects = {
@@ -76,7 +80,14 @@ const LoginGame = () => {
         }),
       };
     });
-    overworld.init(initData);
+
+    if (indexTokenId !== -1) {
+      overworld.init(initData, true);
+      newAccountArray.splice(indexTokenId, 1);
+      localStorage.setItem("newAccount", JSON.stringify(newAccountArray));
+    } else {
+      overworld.init(initData, false);
+    }
   };
 
   return (

@@ -48,6 +48,7 @@ const EvolutionaryStone = () => {
     try {
       if (!itemForBuy) {
         message.error("Something wrong, please reload the page and try again!");
+        return;
       }
 
       if (!selectedAccount) {
@@ -62,6 +63,7 @@ const EvolutionaryStone = () => {
         message.error(
           "Your EEG Token balance is not enough, get it at Faucet page."
         );
+        return;
       }
 
       setIsTxLoading(true);
@@ -139,7 +141,7 @@ const EvolutionaryStone = () => {
             <Spin size="large" />
             {txHash ? (
               <div>
-                <p className="mb-2">You transaction in progress...</p>
+                <p className="mb-2">Your transaction in progress...</p>
                 <p>
                   Hash:{" "}
                   <a
@@ -158,7 +160,11 @@ const EvolutionaryStone = () => {
         </div>
       ) : (
         <>
-          <span>For each chest, you can open a random item in that chest.</span>
+          <span>
+            With evolution stones, you can use it with Ether Beasts that have
+            the ability to evolve to upgrade that beast into a more perfect and
+            powerful version.
+          </span>
           <div className="grid grid-cols-4 gap-4 mt-4">
             {data &&
               Object.keys(data).map((key) => {

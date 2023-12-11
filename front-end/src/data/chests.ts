@@ -10,15 +10,15 @@ interface ChestData {
 const chestsData: ChestData = {
   "102000": {
     name: "Normal Chest",
-    image: "/src/assets/items/chests/NormalChest.png",
+    image: "/images/items/chests/NormalChest.png",
   },
   "102001": {
     name: "Rare Chest",
-    image: "/src/assets/items/chests/RareChest.png",
+    image: "/images/items/chests/RareChest.png",
   },
   "102002": {
     name: "Epic Chest",
-    image: "/src/assets/items/chests/EpicChest.png",
+    image: "/images/items/chests/EpicChest.png",
   },
 };
 

@@ -47,6 +47,7 @@ const Chests = () => {
     try {
       if (!itemForBuy) {
         message.error("Something wrong, please reload the page and try again!");
+        return;
       }
 
       if (!selectedAccount) {
@@ -61,6 +62,7 @@ const Chests = () => {
         message.error(
           "Your EEG Token balance is not enough, get it at Faucet page."
         );
+        return;
       }
 
       setIsTxLoading(true);
@@ -138,7 +140,7 @@ const Chests = () => {
             <Spin size="large" />
             {txHash ? (
               <div>
-                <p className="mb-2">You transaction in progress...</p>
+                <p className="mb-2">Your transaction in progress...</p>
                 <p>
                   Hash:{" "}
                   <a

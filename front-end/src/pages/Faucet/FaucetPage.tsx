@@ -43,7 +43,7 @@ const FaucetPage = () => {
                 <Spin size="large" />
                 {txHash ? (
                   <div className="text-[12px]">
-                    <p className="mb-2">You transaction in progress...</p>
+                    <p className="mb-2">Your transaction in progress...</p>
                     <p>
                       Hash:{" "}
                       <a

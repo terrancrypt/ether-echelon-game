@@ -42,6 +42,7 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
     error EEEngine_EggCannotHatch();
     error EEEngine_NumberItemsInChestNotSet();
     error EEEngine_VrfRequestInvalid();
+    error EEEngine_ChestOpening();
 
     ////////////////////////////////////////
     // ========== State Variables ==========
@@ -80,6 +81,7 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
         uint256[] randomWords;
         uint256 chestId;
         address account;
+        uint256 timestamp;
     }
     mapping(uint256 vrfRequestId => VRFRequestInfor) private s_vrfRequestInfor;
     uint32 constant NUMB_WORDS = 1;
@@ -110,7 +112,8 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
     event VRFInformationChanged(
         uint256 newSubscriptionId,
         address newVrfCoordinator,
-        bytes32 newKeyHash
+        bytes32 newKeyHash,
+        uint32 keyCallbackGasLimit
     );
     event GameAssetPriceChanged(uint256 indexed tokenId, uint256 price);
     event MultipleGameAssetPriceChanged(uint256[] tokenIds, uint256[] prices);
@@ -144,6 +147,11 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
     event NumberItemInChestChanged(uint256 numberItemsInChest);
     event ChestInforSetted(uint256 indexed chestId, uint256[] gameAssets);
     event OpenChestConfirmed(
+        address indexed account,
+        uint256 indexed chestId,
+        uint256 vrfRequestId
+    );
+    event OpenChestCanceled(
         address indexed account,
         uint256 indexed chestId,
         uint256 vrfRequestId
@@ -196,7 +204,8 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
         emit VRFInformationChanged(
             newSubscriptionId,
             newVrfCoordinator,
-            newKeyHash
+            newKeyHash,
+            newCallbackGasLimit
         );
     }
 
@@ -545,6 +554,8 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
 
         if (!canHatch) revert EEEngine_EggCannotHatch();
 
+        s_isEggIncubated[account][_eggId] == false;
+
         _burnGameAssets(address(this), _eggId, 1);
         _mintGameAssets(account, beastId, 1, "");
 
@@ -586,10 +597,31 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
             fulfilled: false,
             randomWords: new uint256[](0),
             chestId: _chestId,
-            account: account
+            account: account,
+            timestamp: block.timestamp
         });
 
         emit OpenChestConfirmed(account, _chestId, requestId);
+    }
+
+    /// @dev This function allows the user to cancel the opening of the chest because the VRF chain link does not always work well. And if the VRF chain does not work as expected and returns random results to users, their chests could be stuck in this contract. And to avoid cases of sabotage or preventing the user from opening the chest, about 15 minutes (900 seconds) must pass before the chest can be canceled.
+    function cancelOpenChest(uint256 _requestId) public {
+        VRFRequestInfor memory requestInfor = s_vrfRequestInfor[_requestId];
+        uint256 openTime = requestInfor.timestamp;
+        if (requestInfor.exists == false) {
+            revert EEEngine_VrfRequestInvalid();
+        }
+        if (block.timestamp - openTime < 900) {
+            revert EEEngine_ChestOpening();
+        }
+
+        uint256 chestId = requestInfor.chestId;
+        address account = requestInfor.account;
+
+        s_vrfRequestInfor[_requestId].exists = false;
+        i_gameAssets.safeTransferFrom(address(this), account, chestId, 1, "");
+
+        emit OpenChestCanceled(account, chestId, _requestId);
     }
 
     ////////////////////////////////////////////
@@ -754,5 +786,11 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
         uint256 _requestId
     ) public view returns (VRFRequestInfor memory) {
         return s_vrfRequestInfor[_requestId];
+    }
+
+    function getIsGetStartingBeast(
+        uint256 _tokenId
+    ) public view returns (bool) {
+        return s_tokenIdReveivedBeast[_tokenId];
     }
 }

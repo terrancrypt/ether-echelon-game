@@ -48,6 +48,7 @@ const Eggs = () => {
     try {
       if (!itemForBuy) {
         message.error("Something wrong, please reload the page and try again!");
+        return;
       }
 
       if (!selectedAccount) {
@@ -62,6 +63,7 @@ const Eggs = () => {
         message.error(
           "Your EEG Token balance is not enough, get it at Faucet page."
         );
+        return;
       }
 
       setIsTxLoading(true);
@@ -139,7 +141,7 @@ const Eggs = () => {
             <Spin size="large" />
             {txHash ? (
               <div>
-                <p className="mb-2">You transaction in progress...</p>
+                <p className="mb-2">Your transaction in progress...</p>
                 <p>
                   Hash:{" "}
                   <a
@@ -158,7 +160,7 @@ const Eggs = () => {
         </div>
       ) : (
         <>
-          <span>For each chest, you can open a random item in that chest.</span>
+          <span>Eggs can hatch into beasts corresponding to that egg.</span>
           <div className="grid grid-cols-4 gap-4 mt-4">
             {data &&
               Object.keys(data).map((key) => {

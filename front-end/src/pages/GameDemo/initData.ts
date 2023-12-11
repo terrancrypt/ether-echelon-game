@@ -1,19 +1,19 @@
-import professorHourseCollisions from "../../assets/maps/ProfessorHouse/collisionsData";
-import collisionsTownData from "../../assets/maps/Town/collisionsData";
-import collisionsTown2Data from "../../assets/maps/Town2/conlisionsData";
+import professorHourseCollisions from "../../../public/images/maps/ProfessorHouse/collisionsData";
+import collisionsTownData from "../../../public/images/maps/Town/collisionsData";
+import collisionsTown2Data from "../../../public/images/maps/Town2/conlisionsData";
 import { OverworldMapsData } from "./classes/Overworld";
 import Person from "./classes/Person";
 import { asGridCoord, getCollisionsData, withGrid } from "./utils/utils";
 
 const initData: OverworldMapsData = {
   ProfessorHouse: {
-    lowerSrc: "src/assets/maps/ProfessorHouse/ProfessorHouse.png",
-    upperSrc: "src/assets/maps/ProfessorHouse/UpperProfessorHouse.png",
+    lowerSrc: "/images/maps/ProfessorHouse/ProfessorHouse.png",
+    upperSrc: "/images/maps/ProfessorHouse/UpperProfessorHouse.png",
     gameObjects: {
       npcA: new Person({
         x: withGrid(2),
         y: withGrid(12),
-        src: "images/Characters/LumberJack/LumberJackSpriteSheet.png",
+        src: "/images/characters/LumberJack/LumberJackSpriteSheet.png",
         behaviorLoop: [
           { type: "stand", direction: "down", time: 10000 },
           { type: "walk", direction: "up" },
@@ -36,7 +36,7 @@ const initData: OverworldMapsData = {
       professorNPC: new Person({
         x: withGrid(10),
         y: withGrid(5),
-        src: "images/Characters/Professor/ProfessorSpriteSheet.png",
+        src: "/images/characters/Professor/ProfessorSpriteSheet.png",
         behaviorLoop: [
           { type: "stand", direction: "left", time: 2000 },
           { type: "stand", direction: "down", time: 2000 },
@@ -136,8 +136,8 @@ const initData: OverworldMapsData = {
     },
   },
   Town: {
-    lowerSrc: "src/assets/maps/Town/Town.png",
-    upperSrc: "src/assets/maps/Town/UpperTown.png",
+    lowerSrc: "/images/maps/Town/Town.png",
+    upperSrc: "/images/maps/Town/UpperTown.png",
     gameObjects: {},
     walls: getCollisionsData(collisionsTownData, 31, 42),
     cutsceneSpaces: {
@@ -154,13 +154,106 @@ const initData: OverworldMapsData = {
           ],
         },
       ],
+      [asGridCoord(17, 2)]: [
+        {
+          events: [
+            {
+              type: "changeMap",
+              map: "Town2",
+              x: withGrid(24),
+              y: withGrid(49),
+              direction: "up",
+            },
+          ],
+        },
+      ],
+      [asGridCoord(18, 2)]: [
+        {
+          events: [
+            {
+              type: "changeMap",
+              map: "Town2",
+              x: withGrid(24),
+              y: withGrid(49),
+              direction: "up",
+            },
+          ],
+        },
+      ],
+      [asGridCoord(19, 2)]: [
+        {
+          events: [
+            {
+              type: "changeMap",
+              map: "Town2",
+              x: withGrid(24),
+              y: withGrid(49),
+              direction: "up",
+            },
+          ],
+        },
+      ],
+      [asGridCoord(20, 2)]: [
+        {
+          events: [
+            {
+              type: "changeMap",
+              map: "Town2",
+              x: withGrid(24),
+              y: withGrid(49),
+              direction: "up",
+            },
+          ],
+        },
+      ],
     },
   },
   Town2: {
-    lowerSrc: "src/assets/maps/Town2/Town2.png",
-    upperSrc: "src/assets/maps/Town2/UpperTown2.png",
+    lowerSrc: "/images/maps/Town2/Town2.png",
+    upperSrc: "/images/maps/Town2/UpperTown2.png",
     gameObjects: {},
     walls: getCollisionsData(collisionsTown2Data, 52, 2402),
+    cutsceneSpaces: {
+      [asGridCoord(24, 49)]: [
+        {
+          events: [
+            {
+              type: "changeMap",
+              map: "Town",
+              x: withGrid(18),
+              y: withGrid(2),
+              direction: "down",
+            },
+          ],
+        },
+      ],
+      [asGridCoord(25, 49)]: [
+        {
+          events: [
+            {
+              type: "changeMap",
+              map: "Town",
+              x: withGrid(18),
+              y: withGrid(2),
+              direction: "down",
+            },
+          ],
+        },
+      ],
+      [asGridCoord(26, 49)]: [
+        {
+          events: [
+            {
+              type: "changeMap",
+              map: "Town",
+              x: withGrid(18),
+              y: withGrid(2),
+              direction: "down",
+            },
+          ],
+        },
+      ],
+    },
   },
 };
 export default initData;

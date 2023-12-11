@@ -32,7 +32,12 @@
         "name": "vrfCoordinator",
         "type": "address"
       },
-      { "internalType": "bytes32", "name": "vrfKeyHash", "type": "bytes32" }
+      { "internalType": "bytes32", "name": "vrfKeyHash", "type": "bytes32" },
+      {
+        "internalType": "uint32",
+        "name": "vrfCallbackGasLimit",
+        "type": "uint32"
+      }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
@@ -53,6 +58,7 @@
   },
   { "inputs": [], "name": "EEEngine_AddressAlreadyExists", "type": "error" },
   { "inputs": [], "name": "EEEngine_BeastCannotEvolve", "type": "error" },
+  { "inputs": [], "name": "EEEngine_ChestOpening", "type": "error" },
   { "inputs": [], "name": "EEEngine_EggAlreadyIncubated", "type": "error" },
   { "inputs": [], "name": "EEEngine_EggCannotHatch", "type": "error" },
   { "inputs": [], "name": "EEEngine_EggNotIncubate", "type": "error" },
@@ -338,6 +344,31 @@
         "type": "uint256"
       }
     ],
+    "name": "OpenChestCanceled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "chestId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "vrfRequestId",
+        "type": "uint256"
+      }
+    ],
     "name": "OpenChestConfirmed",
     "type": "event"
   },
@@ -424,6 +455,12 @@
         "internalType": "bytes32",
         "name": "newKeyHash",
         "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "keyCallbackGasLimit",
+        "type": "uint32"
       }
     ],
     "name": "VRFInformationChanged",
@@ -458,6 +495,15 @@
   },
   {
     "inputs": [
+      { "internalType": "uint256", "name": "_requestId", "type": "uint256" }
+    ],
+    "name": "cancelOpenChest",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
       {
         "internalType": "uint64",
         "name": "newSubscriptionId",
@@ -468,7 +514,12 @@
         "name": "newVrfCoordinator",
         "type": "address"
       },
-      { "internalType": "bytes32", "name": "newKeyHash", "type": "bytes32" }
+      { "internalType": "bytes32", "name": "newKeyHash", "type": "bytes32" },
+      {
+        "internalType": "uint32",
+        "name": "newCallbackGasLimit",
+        "type": "uint32"
+      }
     ],
     "name": "changeVrfInfor",
     "outputs": [],
@@ -607,12 +658,48 @@
   },
   {
     "inputs": [
+      { "internalType": "uint256", "name": "_tokenId", "type": "uint256" }
+    ],
+    "name": "getIsGetStartingBeast",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
       { "internalType": "uint256[]", "name": "_tokenIds", "type": "uint256[]" }
     ],
     "name": "getMultipleGameAssetsPrices",
     "outputs": [
       { "internalType": "uint256[]", "name": "tokenIds", "type": "uint256[]" },
       { "internalType": "uint256[]", "name": "prices", "type": "uint256[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_requestId", "type": "uint256" }
+    ],
+    "name": "getVrfRequestInfor",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "bool", "name": "exists", "type": "bool" },
+          { "internalType": "bool", "name": "fulfilled", "type": "bool" },
+          {
+            "internalType": "uint256[]",
+            "name": "randomWords",
+            "type": "uint256[]"
+          },
+          { "internalType": "uint256", "name": "chestId", "type": "uint256" },
+          { "internalType": "address", "name": "account", "type": "address" },
+          { "internalType": "uint256", "name": "timestamp", "type": "uint256" }
+        ],
+        "internalType": "struct EEEngine.VRFRequestInfor",
+        "name": "",
+        "type": "tuple"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
