@@ -3,10 +3,6 @@ import GameInforElementals from "./components/GameInforElementals";
 import GameInforAttack from "./components/GameInforAttack";
 import GameInforMagic from "./components/GameInforMagic";
 
-const onChange = (key: string) => {
-  console.log(key);
-};
-
 const items: TabsProps["items"] = [
   {
     key: "1",
@@ -30,7 +26,7 @@ const SkillsPage = () => {
     <div className="container tracking-tighter">
       <div className="my-8 space-y-4">
         <h2 className="text-[16px]">Skills</h2>
-        <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
+        <Tabs defaultActiveKey="1" items={items} />
       </div>
     </div>
   );

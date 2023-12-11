@@ -1,0 +1,14 @@
+{
+  "name": "Lizard",
+  "image": "https://ipfs.io/ipfs/QmeAeMQv33EdrNcqB1Hao4pVt9u4bExXCwR4P1TQt9zDKE",
+  "attributes": {
+    "evolutionable": false,
+    "rarity": "Normal",
+    "type": "Earth",
+    "hp": 450,
+    "attack": 30,
+    "defend": 50,
+    "speed": 40,
+    "skills": ["Slash", "Volcanic Rock"]
+  }
+}

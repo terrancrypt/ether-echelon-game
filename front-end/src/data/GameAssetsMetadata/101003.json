@@ -1,0 +1,14 @@
+{
+  "name": "Cyclope",
+  "image": "https://ipfs.io/ipfs/QmRzEP3KEaAsZf1zy3SjdA2RHo3Dd6BMS6puqqaWNg1LKS",
+  "attributes": {
+    "evolutionable": true,
+    "rarity": "Rare",
+    "type": "Fire",
+    "hp": 480,
+    "attack": 60,
+    "defend": 40,
+    "speed": 50,
+    "skills": ["Claw", "Inflame"]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Super Slime",
+  "image": "https://ipfs.io/ipfs/QmcdMxiYBkYXMFLm6B6XqwTrVjBcHnVxdjcNakuscYVdXB",
+  "attributes": {
+    "evolutionable": false,
+    "rarity": "Epic",
+    "type": "Water",
+    "hp": 540,
+    "attack": 80,
+    "defend": 60,
+    "speed": 70,
+    "skills": ["Ice Spike", "Ice Thorn"]
+  }
+}

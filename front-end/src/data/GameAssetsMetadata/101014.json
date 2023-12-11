@@ -1,0 +1,14 @@
+{
+  "name": "Mollusc",
+  "image": "https://ipfs.io/ipfs/QmRLV9pCtUt5gAJqMi6WQkmrmH341XmxNGNAEi78PrBNLZ",
+  "attributes": {
+    "evolutionable": false,
+    "rarity": "Normal",
+    "type": "Earth",
+    "hp": 500,
+    "attack": 500,
+    "defend": 500,
+    "speed": 500,
+    "skills": ["Slash Double Curved", "Ground Strike"]
+  }
+}

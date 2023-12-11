@@ -1,0 +1,14 @@
+{
+  "name": "Larva",
+  "image": "https://ipfs.io/ipfs/QmRwGHCWBtC9gUCCaF6CxtZ6ZzgH7eXidiKkTeALxASb2R",
+  "attributes": {
+    "evolutionable": false,
+    "rarity": "Normal",
+    "type": "Grass",
+    "hp": 450,
+    "attack": 40,
+    "defend": 50,
+    "speed": 30,
+    "skills": ["Healing", "Leaf Storm"]
+  }
+}

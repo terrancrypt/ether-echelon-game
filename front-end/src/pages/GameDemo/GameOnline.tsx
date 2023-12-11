@@ -1,19 +1,32 @@
-import { useEffect } from "react";
-import Overworld, { OverworldMapsData } from "./class/Overworld";
+import { useEffect, useRef } from "react";
 import "./gameStyle.css";
-import initData from "./initData";
+import LoginGame from "./components/LoginGame";
+import Bag from "./components/Bag";
+import BeastsOf from "./components/BeastsOf";
+import Incubation from "./components/Incubation";
 
 const GameOnline = () => {
+  const logInComponentRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const overworld = new Overworld({
-      element: document.querySelector(".game-online-container"),
-    });
-    overworld.init(initData);
-  }, []);
+    if (logInComponentRef.current) {
+      logInComponentRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [logInComponentRef]);
   return (
     <div className="flex items-center justify-center h-screen">
-      <div className="game-online-container scale-[3] relative outline">
-        <canvas className="game-online-canvas "></canvas>
+      <div
+        ref={logInComponentRef}
+        className="game-online-container scale-[3] relative outline"
+      >
+        <Bag />
+        <BeastsOf />
+        <Incubation />
+        <LoginGame />
+        <canvas
+          className="game-online-canvas"
+          width={352}
+          height={198}
+        ></canvas>
       </div>
     </div>
   );

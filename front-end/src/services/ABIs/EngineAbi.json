@@ -16,12 +16,71 @@
         "internalType": "address",
         "name": "gameAssetsAddress",
         "type": "address"
-      }
+      },
+      {
+        "internalType": "address",
+        "name": "etherEchelonToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint64",
+        "name": "vrfSubscriptionId",
+        "type": "uint64"
+      },
+      {
+        "internalType": "address",
+        "name": "vrfCoordinator",
+        "type": "address"
+      },
+      { "internalType": "bytes32", "name": "vrfKeyHash", "type": "bytes32" }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
-  { "inputs": [], "name": "EEEngine__AddressAlreadyExists", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "target", "type": "address" }
+    ],
+    "name": "AddressEmptyCode",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "AddressInsufficientBalance",
+    "type": "error"
+  },
+  { "inputs": [], "name": "EEEngine_AddressAlreadyExists", "type": "error" },
+  { "inputs": [], "name": "EEEngine_BeastCannotEvolve", "type": "error" },
+  { "inputs": [], "name": "EEEngine_EggAlreadyIncubated", "type": "error" },
+  { "inputs": [], "name": "EEEngine_EggCannotHatch", "type": "error" },
+  { "inputs": [], "name": "EEEngine_EggNotIncubate", "type": "error" },
+  { "inputs": [], "name": "EEEngine_InputNotMatchLength", "type": "error" },
+  { "inputs": [], "name": "EEEngine_InsufficientBalance", "type": "error" },
+  { "inputs": [], "name": "EEEngine_InvalidArray", "type": "error" },
+  { "inputs": [], "name": "EEEngine_MustBeOwner", "type": "error" },
+  { "inputs": [], "name": "EEEngine_MustNotBeZero", "type": "error" },
+  { "inputs": [], "name": "EEEngine_NotAnEgg", "type": "error" },
+  { "inputs": [], "name": "EEEngine_NotStartingBeast", "type": "error" },
+  {
+    "inputs": [],
+    "name": "EEEngine_NumberItemsInChestNotSet",
+    "type": "error"
+  },
+  { "inputs": [], "name": "EEEngine_StartingBeastReceived", "type": "error" },
+  { "inputs": [], "name": "EEEngine_TokenIdInvalid", "type": "error" },
+  { "inputs": [], "name": "EEEngine_TokenPriceHasNotSet", "type": "error" },
+  { "inputs": [], "name": "EEEngine_VrfRequestInvalid", "type": "error" },
+  { "inputs": [], "name": "FailedInnerCall", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "have", "type": "address" },
+      { "internalType": "address", "name": "want", "type": "address" }
+    ],
+    "name": "OnlyCoordinatorCanFulfill",
+    "type": "error"
+  },
   {
     "inputs": [
       { "internalType": "address", "name": "owner", "type": "address" }
@@ -35,6 +94,252 @@
     ],
     "name": "OwnableUnauthorizedAccount",
     "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "token", "type": "address" }
+    ],
+    "name": "SafeERC20FailedOperation",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "beastId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "toBeastId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "conditionId",
+        "type": "uint256"
+      }
+    ],
+    "name": "BeastEvolveInforSetted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "fromBeastId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "toBeastId",
+        "type": "uint256"
+      }
+    ],
+    "name": "BeastEvolved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "chestId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "gameAssets",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "ChestInforSetted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "chestId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "gameAssetId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ChestOpened",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "eggId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "beastId",
+        "type": "uint256"
+      }
+    ],
+    "name": "EggHatched",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "eggId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "incubateToBeastId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "hatchingTime",
+        "type": "uint256"
+      }
+    ],
+    "name": "EggIncubateInforSetted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "eggId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timeStart",
+        "type": "uint256"
+      }
+    ],
+    "name": "EggIncubated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "price",
+        "type": "uint256"
+      }
+    ],
+    "name": "GameAssetPriceChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "tokenIds",
+        "type": "uint256[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "prices",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "MultipleGameAssetPriceChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "numberItemsInChest",
+        "type": "uint256"
+      }
+    ],
+    "name": "NumberItemInChestChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "chestId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "vrfRequestId",
+        "type": "uint256"
+      }
+    ],
+    "name": "OpenChestConfirmed",
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -56,10 +361,116 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "accountTokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "accountAddr",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "beastId",
+        "type": "uint256"
+      }
+    ],
+    "name": "StartingBeastReceived",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "beastId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isStartingBeast",
+        "type": "bool"
+      }
+    ],
+    "name": "StartingBeastSetted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newSubscriptionId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newVrfCoordinator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "newKeyHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "VRFInformationChanged",
+    "type": "event"
+  },
+  {
     "inputs": [
       { "internalType": "string", "name": "_ipfsImageHash", "type": "string" }
     ],
-    "name": "addIpfsImageHash",
+    "name": "addIpfsImageHashForAccountNft",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256[]", "name": "_tokenIds", "type": "uint256[]" }
+    ],
+    "name": "addMultipleTokenIdsGameAssets",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_tokenId", "type": "uint256" }
+    ],
+    "name": "addSingleTokenIdForGameAssets",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint64",
+        "name": "newSubscriptionId",
+        "type": "uint64"
+      },
+      {
+        "internalType": "address",
+        "name": "newVrfCoordinator",
+        "type": "address"
+      },
+      { "internalType": "bytes32", "name": "newKeyHash", "type": "bytes32" }
+    ],
+    "name": "changeVrfInfor",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -86,10 +497,224 @@
     "type": "function"
   },
   {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" },
+      {
+        "internalType": "uint256",
+        "name": "_beastIdForEvolve",
+        "type": "uint256"
+      }
+    ],
+    "name": "evolveBeast",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" },
+      { "internalType": "uint256", "name": "_tokenId", "type": "uint256" }
+    ],
+    "name": "getAccountIsIncubateEgg",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_tokenId", "type": "uint256" }
+    ],
+    "name": "getBeastEnvolveInfor",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "bool", "name": "evolutionable", "type": "bool" },
+          {
+            "internalType": "uint256",
+            "name": "evolveToBeastId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "conditionAssetId",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct EEEngine.EvolveInfor",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_tokenId", "type": "uint256" }
+    ],
+    "name": "getChestInfor",
+    "outputs": [
+      { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_tokenId", "type": "uint256" }
+    ],
+    "name": "getEggIncubateInfor",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "hatchingTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "incubateToBeastId",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct EEEngine.IncubateInfor",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" },
+      { "internalType": "uint256", "name": "_tokenId", "type": "uint256" }
+    ],
+    "name": "getEggIncubatedStartTime",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_tokenId", "type": "uint256" }
+    ],
+    "name": "getGameAssetPrice",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256[]", "name": "_tokenIds", "type": "uint256[]" }
+    ],
+    "name": "getMultipleGameAssetsPrices",
+    "outputs": [
+      { "internalType": "uint256[]", "name": "tokenIds", "type": "uint256[]" },
+      { "internalType": "uint256[]", "name": "prices", "type": "uint256[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" },
+      { "internalType": "uint256", "name": "_eggId", "type": "uint256" }
+    ],
+    "name": "hatchEgg",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" },
+      { "internalType": "uint256", "name": "_eggId", "type": "uint256" }
+    ],
+    "name": "incubateAnEgg",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" },
+      { "internalType": "uint256", "name": "_tokenId", "type": "uint256" },
+      { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+    ],
+    "name": "mintGameAsset",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "uint256[]", "name": "", "type": "uint256[]" },
+      { "internalType": "uint256[]", "name": "", "type": "uint256[]" },
+      { "internalType": "bytes", "name": "", "type": "bytes" }
+    ],
+    "name": "onERC1155BatchReceived",
+    "outputs": [{ "internalType": "bytes4", "name": "", "type": "bytes4" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "bytes", "name": "", "type": "bytes" }
+    ],
+    "name": "onERC1155Received",
+    "outputs": [{ "internalType": "bytes4", "name": "", "type": "bytes4" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" },
+      { "internalType": "uint256", "name": "_chestId", "type": "uint256" }
+    ],
+    "name": "openChest",
+    "outputs": [
+      { "internalType": "uint256", "name": "requestId", "type": "uint256" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "owner",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "requestId", "type": "uint256" },
+      {
+        "internalType": "uint256[]",
+        "name": "randomWords",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "rawFulfillRandomWords",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_tokenId", "type": "uint256" },
+      { "internalType": "uint256", "name": "_beastId", "type": "uint256" }
+    ],
+    "name": "receiveStartingBeast",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -101,9 +726,124 @@
   },
   {
     "inputs": [
+      { "internalType": "uint256", "name": "_beastTokenId", "type": "uint256" },
+      { "internalType": "uint256", "name": "_envolveToId", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "conditionAssetId",
+        "type": "uint256"
+      }
+    ],
+    "name": "setBeastEvolveInfor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_chestId", "type": "uint256" },
+      {
+        "internalType": "uint256[]",
+        "name": "gameAssetsInChest",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "setChestInfor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_eggId", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "_incubateToBeastId",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "_hatchingTime", "type": "uint256" }
+    ],
+    "name": "setEggIncubateInfor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_tokenId", "type": "uint256" },
+      { "internalType": "uint256", "name": "price", "type": "uint256" }
+    ],
+    "name": "setGameAssetPrice",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256[]", "name": "_tokenIds", "type": "uint256[]" },
+      { "internalType": "uint256[]", "name": "prices", "type": "uint256[]" }
+    ],
+    "name": "setMultipleGameAssetPrice",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "_newNumberItemsInChest",
+        "type": "uint32"
+      }
+    ],
+    "name": "setNumberItemsInChest",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_beastId", "type": "uint256" },
+      { "internalType": "bool", "name": "isStartingBeast", "type": "bool" }
+    ],
+    "name": "setStartingBeast",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "_ipfsHash", "type": "string" }
+    ],
+    "name": "setUpIfpsHashForGameAssets",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes4", "name": "interfaceId", "type": "bytes4" }
+    ],
+    "name": "supportsInterface",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
       { "internalType": "address", "name": "newOwner", "type": "address" }
     ],
     "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_tokenId", "type": "uint256" },
+      { "internalType": "bool", "name": "_state", "type": "bool" }
+    ],
+    "name": "updateTokenStateInGameAssets",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

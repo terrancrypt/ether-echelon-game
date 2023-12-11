@@ -1,0 +1,14 @@
+{
+  "name": "Demon Cyclope",
+  "image": "https://ipfs.io/ipfs/QmWGd84XZBcLeHiWr5PgxVUB9SDuqfZZAQKAAmyPiEm8BT",
+  "attributes": {
+    "evolutionable": false,
+    "rarity": "Epic",
+    "type": "Fire",
+    "hp": 540,
+    "attack": 80,
+    "defend": 60,
+    "speed": 70,
+    "skills": ["Claw Double", "Fire Ball"]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Butterfly",
+  "image": "https://ipfs.io/ipfs/QmYtMP4uAeWp7BEPNMyMwo14UD2P5GpbMzC1BqBiYnquQX",
+  "attributes": {
+    "evolutionable": false,
+    "rarity": "Normal",
+    "type": "Fire",
+    "hp": 450,
+    "attack": 50,
+    "defend": 40,
+    "speed": 40,
+    "skills": ["Circular Slash", "Burn"]
+  }
+}

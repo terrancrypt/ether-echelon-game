@@ -1,0 +1,14 @@
+{
+  "name": "Giant Flam",
+  "image": "https://ipfs.io/ipfs/QmXxmaQDBrYzSp6wcAbPgd2xKQiRDQ8HAm6EY5GjNLRugt",
+  "attributes": {
+    "evolutionable": false,
+    "rarity": "Epic",
+    "type": "Fire",
+    "hp": 540,
+    "attack": 80,
+    "defend": 60,
+    "speed": 70,
+    "skills": ["Inflame", "Fire Ball"]
+  }
+}

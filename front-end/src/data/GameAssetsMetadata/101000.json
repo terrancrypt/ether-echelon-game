@@ -1,0 +1,14 @@
+{
+  "name": "Axolot",
+  "image": "https://ipfs.io/ipfs/QmWhjgPQuVgHdBVE4geLCtZYL49UxumdHLYcxDTG9cU57e",
+  "attributes": {
+    "evolutionable": false,
+    "rarity": "Normal",
+    "type": "Water",
+    "hp": 450,
+    "attack": 30,
+    "defend": 50,
+    "speed": 40,
+    "skills": ["Slash Double", "Water Jet"]
+  }
+}

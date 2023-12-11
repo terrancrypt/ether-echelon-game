@@ -1,0 +1,41 @@
+{
+  "Beasts": {
+    "101000": "Axolot",
+    "101001": "Bamboo",
+    "101002": "Butterfly",
+    "101003": "Cyclope",
+    "101004": "DemonCyclope",
+    "101005": "TinyDragon",
+    "101006": "GhostEye",
+    "101007": "Flam",
+    "101008": "GiantFlam",
+    "101009": "GoldRacoon",
+    "101010": "GiantGoldRacoon",
+    "101011": "Larva",
+    "101012": "Lizard",
+    "101013": "Mole",
+    "101014": "Mollusc",
+    "101015": "ThunderOwl",
+    "101016": "DemonOwl",
+    "101017": "Slime",
+    "101018": "SuperSlime",
+    "101019": "TinyGrassSnake",
+    "101020": "GrassSnake"
+  },
+  "Chests": {
+    "102000": "NormalChest",
+    "102001": "RareChest",
+    "102002": "EpicChest"
+  },
+  "EvolutionaryStones": {
+    "103000": "FireStone",
+    "103001": "GrassStone",
+    "103002": "WaterStone",
+    "103003": "EarthStone"
+  },
+  "Egg": {
+    "104000": "GrassSnakeEgg",
+    "104001": "ThunderOwlEgg",
+    "104002": "DemonOwlEgg"
+  }
+}

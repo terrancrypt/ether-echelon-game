@@ -121,7 +121,7 @@ export const skillsData: SkillsData = {
     },
     description: "Restores own health.",
   },
-  IncreaseAttack: {
+  "Increase Attack": {
     type: "Magic",
     target: "Self",
     orientation: "Appear",

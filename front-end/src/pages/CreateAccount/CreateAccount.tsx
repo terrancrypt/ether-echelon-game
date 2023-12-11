@@ -11,14 +11,8 @@ import { addTokenToWallet } from "../../utils/metamask";
 import { charactersData } from "../../data/charaters";
 import { createAccountNftWithAddress } from "../../services/contract-services/EngineServ";
 import dataContract from "../../services/contract-services/dataContract";
-import {
-  ENGINE_CONTRACT,
-  ERC6551_REGISTRY_CONTRACT,
-} from "../../services/contract-services/constants";
-import {
-  addDocToFireStore,
-  getAllDataFromFirestore,
-} from "../../services/firebase/fireStore";
+import { ERC6551_REGISTRY_CONTRACT } from "../../services/contract-services/constants";
+import { getTokenUri } from "../../services/contract-services/AccountNftServ";
 
 const { Option } = Select;
 
@@ -34,11 +28,12 @@ interface AccountInfor {
 
 interface AccountCreated extends AccountInfor {
   tokenId: string;
+  accountAddr: string;
 }
 
 const CreateAccountPage: React.FC = () => {
   const [form] = Form.useForm();
-  const { address } = getAccount();
+  const { isConnected } = getAccount();
   const [characterImg, setCharacterImg] = useState<CharacterImg | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [txHash, setTxHash] = useState<string | null>(null);
@@ -61,30 +56,32 @@ const CreateAccountPage: React.FC = () => {
       abi: dataContract[ERC6551_REGISTRY_CONTRACT].abi,
       eventName: "AccountCreated",
     },
-    (log: any) => {
-      console.log(log);
-      // if (log[0].args.account === address) {
-      //   try {
-      //     // const storedData = window.localStorage.getItem("userData");
-      //     // const userDataArray = storedData ? JSON.parse(storedData) : [];
-      //     // const newData = {
-      //     //   address: log[0].args.owner,
-      //     //   username: values.username,
-      //     //   character: values.character,
-      //     //   tokenId: formatUnits(log[0].args.tokenId, 0),
-      //     // };
-      //     // userDataArray.push(newData);
-      //     // window.localStorage.setItem(
-      //     //   "userData",
-      //     //   JSON.stringify(userDataArray)
-      //     // );
-      //     // fetchAccountList();
+    async (log: any) => {
+      try {
+        const storedData = window.localStorage.getItem("userData");
+        const userDataArray = storedData ? JSON.parse(storedData) : [];
 
-      //     console.log(log);
-      //   } catch (error) {
-      //     console.log(error);
-      //   }
-      // }
+        const tokenId = formatUnits(log[0].args.tokenId, 0);
+
+        const isTokenExists = userDataArray.some(
+          (obj: any) => obj.tokenId === tokenId
+        );
+
+        if (!isTokenExists) {
+          const newData = {
+            accountAddress: log[0].args.account,
+            tokenId: tokenId,
+          };
+          userDataArray.push(newData);
+          window.localStorage.setItem(
+            "userData",
+            JSON.stringify(userDataArray)
+          );
+          await fetchUserData();
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
   );
 
@@ -114,11 +111,53 @@ const CreateAccountPage: React.FC = () => {
     }
   };
 
-  const fetchAccountList = () => {
+  const fetchUserData = async () => {
     const storedData = window.localStorage.getItem("userData");
     if (storedData) {
-      const userData = JSON.parse(storedData);
-      setAccountCreated(userData);
+      let userDataArray = JSON.parse(storedData);
+
+      // Sử dụng Set để loại bỏ các tokenId trùng lặp
+      const uniqueTokenIds = new Set();
+
+      // Duyệt qua mảng để thêm mới các phần tử vào uniqueTokenIds
+      for (const object of userDataArray) {
+        const tokenId = object.tokenId;
+        uniqueTokenIds.add(tokenId);
+      }
+
+      // Tạo một mảng mới từ uniqueTokenIds để giữ các tokenId duy nhất
+      const uniqueUserDataArray = Array.from(uniqueTokenIds).map(
+        async (tokenId: any) => {
+          const tokenUri = await getTokenUri(tokenId);
+          const splitUrl = tokenUri.image.split("/");
+          const imgHash = splitUrl.pop();
+
+          const character =
+            Object.keys(charactersData).find(
+              (key) => charactersData[key].ipfsHash === imgHash
+            ) || null;
+
+          return {
+            tokenId: tokenId,
+            character: character,
+            accountAddr: tokenUri.accountAddr,
+            username: tokenUri.userName,
+          };
+        }
+      );
+
+      // Đợi tất cả các promise trong uniqueUserDataArray hoàn thành
+      const resolvedUniqueUserDataArray = await Promise.all(
+        uniqueUserDataArray
+      );
+
+      // Cập nhật lại localStorage với mảng đã loại bỏ tokenId trùng lặp
+      window.localStorage.setItem(
+        "userData",
+        JSON.stringify(resolvedUniqueUserDataArray)
+      );
+
+      setAccountCreated(resolvedUniqueUserDataArray as any);
     }
   };
 
@@ -140,170 +179,173 @@ const CreateAccountPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchAccountList();
-
-    getAllDataFromFirestore();
-    addDocToFireStore(1, "0x89865e03c04d9f51614087f6f9c58a1972bdbff4");
-  }, []);
+    fetchUserData();
+  }, [isConnected]);
 
   return (
-    <div className="container flex justify-center tracking-tighter">
-      {isLoading ? (
-        <div className="mt-12 flex justify-center items-center">
-          <div className="flex flex-col justify-center gap-8">
-            <Spin size="large" />
-            {txHash ? (
-              <div>
-                <p className="mb-2">You transaction in progress...</p>
-                <p>
-                  Hash:{" "}
-                  <a
-                    className="underline cursor-pointer hover:text-blue-700"
-                    href={`https://mumbai.polygonscan.com/tx/` + txHash}
-                    target="_blank"
-                  >
-                    {shortenAddr(txHash)}
-                  </a>
-                </p>
+    <>
+      {isConnected ? (
+        <div className="container flex justify-center tracking-tighter">
+          {isLoading ? (
+            <div className="mt-12 flex justify-center items-center">
+              <div className="flex flex-col justify-center gap-8">
+                <Spin size="large" />
+                {txHash ? (
+                  <div>
+                    <p className="mb-2">You transaction in progress...</p>
+                    <p>
+                      Hash:{" "}
+                      <a
+                        className="underline cursor-pointer hover:text-blue-700"
+                        href={`https://mumbai.polygonscan.com/tx/` + txHash}
+                        target="_blank"
+                      >
+                        {shortenAddr(txHash)}
+                      </a>
+                    </p>
+                  </div>
+                ) : (
+                  <></>
+                )}
               </div>
-            ) : (
-              <></>
-            )}
-          </div>
-        </div>
-      ) : (
-        <div>
-          <div className="mt-8 flex items-start justify-between gap-4">
-            <div className="flex-[0.7] bg-[white] rounded-lg p-6">
-              <div className="text-sm font-bold text-black mb-5 w-[500px] flex items-center gap-2">
-                <h1>Create Your New Account</h1>
-                <Tooltip
-                  title="By creating an NFT (ERC721) and storing it in your personal wallet, you can use this NFT account to log into Ether Echelon games. Each NFT Account has its own wallet address to store in-game items and currency. If you transfer this NFT to another personal wallet address, any items in the NFT Account will move with it."
-                  placement="bottomLeft"
-                >
-                  <span className="hover:scale-90 cursor-pointer">
-                    <img
-                      src="/icons/question-mark.svg"
-                      alt=""
-                      width={30}
-                      height={30}
-                    />
-                  </span>
-                </Tooltip>
-              </div>
-
-              {/* Form */}
-              <Form
-                form={form}
-                layout="vertical"
-                onFinish={onFinish}
-                style={{ maxWidth: 600 }}
-                className="text-xs"
-              >
-                <span>Username</span>
-                <Form.Item name="username" rules={[{ required: true }]}>
-                  <Input />
-                </Form.Item>
-
-                <span>Character</span>
-                <Form.Item name="character" rules={[{ required: true }]}>
-                  <Select
-                    placeholder="Select the character that will appear in the game"
-                    onChange={onCharacterChange}
-                  >
-                    {Object.keys(charactersData).map((key) => {
-                      return (
-                        <Option key={key} value={key}>
-                          {key}
-                        </Option>
-                      );
-                    })}
-                  </Select>
-                </Form.Item>
-                <Form.Item>
-                  <button
-                    className={
-                      "px-4 py-2 border-2 border-black hover:bg-black hover:text-white transition-all mt-2 "
-                    }
-                    type="submit"
-                  >
-                    Create
-                  </button>
-                </Form.Item>
-              </Form>
-            </div>
-
-            <div className="flex-1 relative">
-              <img
-                alt=""
-                src={
-                  characterImg
-                    ? characterImg.inGameImg
-                    : "/images/Characters/Undefined.gif"
-                }
-                width={300}
-                height={300}
-              />
-              <div className="w-[50px] h-[50px] absolute top-4 left-4">
-                <img
-                  alt=""
-                  src={
-                    characterImg
-                      ? characterImg.avatarImg
-                      : "/images/Characters/Undefined.png"
-                  }
-                  width={50}
-                  height={50}
-                />
-              </div>
-            </div>
-          </div>
-          {accountCreated?.length != 0 && accountCreated != null ? (
-            <div className="mt-6 p-4 bg-white bg-opacity-80 text-black mb-10 text-sm">
-              The accounts you have created:
-              <table className="w-full mt-4 text-left text-[10px]">
-                <thead className="border-b border-b-black mb-2">
-                  <tr>
-                    <th>Username</th>
-                    <th>Character</th>
-                    <th>TokenId</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {accountCreated?.map((account, index) => (
-                    <tr className="text-[10px]" key={index}>
-                      <td className="py-4">{account.username}</td>
-                      <td className="py-4">{account.character}</td>
-                      <td className="py-4">{account.tokenId}</td>
-                      <td className="max-w-[100px] text-[10px]">
-                        <button
-                          onClick={() => {
-                            addTokenToWallet(account.tokenId);
-                          }}
-                          className="px-2 py-1 border-2 border-black hover:bg-black hover:text-white transition-all"
-                        >
-                          Add to wallet
-                        </button>
-                        <button
-                          onClick={() => {
-                            onRemoveToken(account.tokenId);
-                          }}
-                          className="px-2 py-1 border-2 border-black hover:bg-red-400 hover:text-white transition-all"
-                        >
-                          Remove
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           ) : (
-            <></>
+            <div>
+              <div className="mt-8 flex items-start justify-between gap-4">
+                <div className="flex-[0.7] bg-[white] rounded-lg p-6">
+                  <div className="text-sm font-bold text-black mb-5 w-[500px] flex items-center gap-2">
+                    <h1>Create Your New Account</h1>
+                    <Tooltip
+                      title="By creating an NFT (ERC721) and storing it in your personal wallet, you can use this NFT account to log into Ether Echelon games. Each NFT Account has its own wallet address to store in-game items and currency. If you transfer this NFT to another personal wallet address, any items in the NFT Account will move with it."
+                      placement="bottomLeft"
+                    >
+                      <span className="hover:scale-90 cursor-pointer">
+                        <img
+                          src="/icons/question-mark.svg"
+                          alt=""
+                          width={30}
+                          height={30}
+                        />
+                      </span>
+                    </Tooltip>
+                  </div>
+
+                  {/* Form */}
+                  <Form
+                    form={form}
+                    layout="vertical"
+                    onFinish={onFinish}
+                    style={{ maxWidth: 600 }}
+                    className="text-xs"
+                  >
+                    <span>Username</span>
+                    <Form.Item name="username" rules={[{ required: true }]}>
+                      <Input />
+                    </Form.Item>
+
+                    <span>Character</span>
+                    <Form.Item name="character" rules={[{ required: true }]}>
+                      <Select
+                        placeholder="Select the character that will appear in the game"
+                        onChange={onCharacterChange}
+                      >
+                        {Object.keys(charactersData).map((key) => {
+                          return (
+                            <Option key={key} value={key}>
+                              {key}
+                            </Option>
+                          );
+                        })}
+                      </Select>
+                    </Form.Item>
+                    <Form.Item>
+                      <button
+                        className={
+                          "px-4 py-2 border-2 border-black hover:bg-black hover:text-white transition-all mt-2 "
+                        }
+                        type="submit"
+                      >
+                        Create
+                      </button>
+                    </Form.Item>
+                  </Form>
+                </div>
+
+                <div className="flex-1 relative">
+                  <img
+                    alt=""
+                    src={
+                      characterImg
+                        ? characterImg.inGameImg
+                        : "/images/Characters/Undefined.gif"
+                    }
+                    width={300}
+                    height={300}
+                  />
+                  <div className="w-[50px] h-[50px] absolute top-4 left-4">
+                    <img
+                      alt=""
+                      src={
+                        characterImg
+                          ? characterImg.avatarImg
+                          : "/images/Characters/Undefined.png"
+                      }
+                      width={50}
+                      height={50}
+                    />
+                  </div>
+                </div>
+              </div>
+              {accountCreated?.length != 0 && accountCreated != null ? (
+                <div className="mt-6 p-4 bg-white bg-opacity-80 text-black mb-10 text-sm">
+                  The accounts you have created:
+                  <table className="w-full mt-4 text-left text-[10px]">
+                    <thead className="border-b border-b-black mb-2">
+                      <tr>
+                        <th>Username</th>
+                        <th>Character</th>
+                        <th>TokenId</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {accountCreated?.map((account, index) => (
+                        <tr className="text-[10px]" key={index}>
+                          <td className="py-4">{account.username}</td>
+                          <td className="py-4">{account.character}</td>
+                          <td className="py-4">{account.tokenId}</td>
+                          <td className="max-w-[100px] text-[10px]">
+                            <button
+                              onClick={() => {
+                                addTokenToWallet(account.tokenId);
+                              }}
+                              className="px-2 py-1 border-2 border-black hover:bg-black hover:text-white transition-all"
+                            >
+                              Add to wallet
+                            </button>
+                            <button
+                              onClick={() => {
+                                onRemoveToken(account.tokenId);
+                              }}
+                              className="px-2 py-1 border-2 border-black hover:bg-red-400 hover:text-white transition-all"
+                            >
+                              Remove
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <></>
+              )}
+            </div>
           )}
         </div>
+      ) : (
+        <p className="text-center pt-10">Please connect your wallet</p>
       )}
-    </div>
+    </>
   );
 };
 

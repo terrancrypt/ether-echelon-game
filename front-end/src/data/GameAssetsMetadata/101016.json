@@ -1,0 +1,14 @@
+{
+  "name": "Demon Owl",
+  "image": "https://ipfs.io/ipfs/QmcTeggm3URgDnoAX89xuy6z3Ag9vSNuuwm6qqH3qe34Zt",
+  "attributes": {
+    "evolutionable": false,
+    "rarity": "Rare",
+    "type": "Fire",
+    "hp": 480,
+    "attack": 60,
+    "defend": 40,
+    "speed": 50,
+    "skills": ["Burn", "Fire Ball"]
+  }
+}

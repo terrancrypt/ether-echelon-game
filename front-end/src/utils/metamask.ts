@@ -1,4 +1,7 @@
-import { ACCOUNT_NFT_CONTRACT } from "../services/contract-services/constants";
+import {
+  ACCOUNT_NFT_CONTRACT,
+  EEG_CONTRACT,
+} from "../services/contract-services/constants";
 import dataContract from "../services/contract-services/dataContract";
 
 interface WindowChain extends Window {
@@ -25,4 +28,27 @@ const addTokenToWallet = async (tokenId: string): Promise<boolean> => {
   }
 };
 
-export { addTokenToWallet };
+const addEEGTokenToWallet = async () => {
+  try {
+    // 'wasAdded' is a boolean. Like any RPC method, an error can be thrown.
+    const wasAdded = await (window as WindowChain).ethereum.request({
+      method: "wallet_watchAsset",
+      params: {
+        type: "ERC20",
+        options: {
+          address: dataContract[EEG_CONTRACT].address,
+          symbol: "EEG",
+          decimals: 18,
+          image: "/EtherEchelon_Logo.png",
+        },
+      },
+    });
+
+    if (wasAdded) return true;
+    return false;
+  } catch (error) {
+    return false;
+  }
+};
+
+export { addTokenToWallet, addEEGTokenToWallet };

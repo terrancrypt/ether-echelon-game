@@ -1,0 +1,14 @@
+{
+  "name": "Mole",
+  "image": "https://ipfs.io/ipfs/QmbwbUXg7J7yB3HkUUFtdpqbHuRkAzsRsbp8gk1Dv6uG2n",
+  "attributes": {
+    "evolutionable": false,
+    "rarity": "Normal",
+    "type": "Earth",
+    "hp": 450,
+    "attack": 50,
+    "defend": 60,
+    "speed": 40,
+    "skills": ["Cut", "Burn"]
+  }
+}

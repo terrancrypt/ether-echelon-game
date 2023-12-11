@@ -1,0 +1,14 @@
+{
+  "name": "Slime",
+  "image": "https://ipfs.io/ipfs/QmacLnUaDjJgavDJ7wn7EAX8Cwid9jqjVvkLfBfZGDnCDP",
+  "attributes": {
+    "evolutionable": true,
+    "rarity": "Normal",
+    "type": "Water",
+    "hp": 450,
+    "attack": 40,
+    "defend": 50,
+    "speed": 40,
+    "skills": ["Slash", "Water Jet"]
+  }
+}

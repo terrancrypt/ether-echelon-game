@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { skillsData } from "../../../data/skills";
-import { SkillsType } from "../SkillsType";
+import { SkillsType } from "../Skills.type";
 
 const GameInforAttack = () => {
   const [dataSkills, setDataSkills] = useState<SkillsType[] | null>(null);

@@ -1,0 +1,14 @@
+{
+  "name": "Bamboo",
+  "image": "https://ipfs.io/ipfs/QmU5jEjbqxfwdu5zrboo3fRYHrV4G6DQgyLDLuK8EEmWN2",
+  "attributes": {
+    "evolutionable": false,
+    "rarity": "Normal",
+    "type": "Grass",
+    "hp": 450,
+    "attack": 40,
+    "defend": 50,
+    "speed": 30,
+    "skills": ["Slash", "Grass Cut"]
+  }
+}

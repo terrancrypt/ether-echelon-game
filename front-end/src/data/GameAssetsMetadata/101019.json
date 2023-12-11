@@ -1,0 +1,14 @@
+{
+  "name": "Tiny Grass Snake",
+  "image": "https://ipfs.io/ipfs/QmNVmQUvmnZV6KyYd4yqmdHc7JBRrqxJgY7tGoGLgMLxkr",
+  "attributes": {
+    "evolutionable": true,
+    "rarity": "Rare",
+    "type": "Grass",
+    "hp": 480,
+    "attack": 50,
+    "defend": 60,
+    "speed": 40,
+    "skills": ["Slash Curved", "Leaf Storm"]
+  }
+}

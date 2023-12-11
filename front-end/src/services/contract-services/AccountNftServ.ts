@@ -16,6 +16,16 @@ const checkOwner = async (tokenId: string) => {
   return result;
 };
 
+const getAccountAddrById = async (tokenId: string) => {
+  const result = await readContract({
+    address: address,
+    abi: abi,
+    functionName: "getAccountAddrById",
+    args: [tokenId],
+  });
+  return result;
+};
+
 const getTokenUri = async (tokenId: string) => {
   const result = await readContract({
     address: address,
@@ -56,9 +66,14 @@ const mintAccountNft = async (
     });
     return hash;
   } catch (error) {
-    console.log();
     return null;
   }
 };
 
-export { mintAccountNft, checkOwner, getTokenUri, getTokenCount };
+export {
+  mintAccountNft,
+  checkOwner,
+  getTokenUri,
+  getTokenCount,
+  getAccountAddrById,
+};

@@ -1,0 +1,14 @@
+{
+  "name": "Racoon",
+  "image": "https://ipfs.io/ipfs/QmYpPtPtXt5yygk12TQcWAcKZYHCu3uqh4oeRQPAGfEtw9",
+  "attributes": {
+    "evolutionable": true,
+    "rarity": "Rare",
+    "type": "Earth",
+    "hp": 480,
+    "attack": 40,
+    "defend": 60,
+    "speed": 40,
+    "skills": ["Slash Curved", "Ground Strike"]
+  }
+}

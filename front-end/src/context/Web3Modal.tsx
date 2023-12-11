@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { EIP6963Connector, createWeb3Modal } from "@web3modal/wagmi/react";
 import { WagmiConfig, configureChains, createConfig } from "wagmi";
-import { avalancheFuji, polygonMumbai } from "viem/chains";
+import { polygonMumbai } from "viem/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
@@ -13,7 +13,7 @@ const projectId = "8113267d88fce267d26e0b99c63b53a6";
 const { chains, publicClient } = configureChains(
   [polygonMumbai],
   [
-    alchemyProvider({ apiKey: "X5TDnhDZ4rXaZMJMggXrFQ-b5cySxi4O" }),
+    alchemyProvider({ apiKey: "6pwYtYVnmteVCBkM-oLXD9sK5bOIZxh9" }),
     publicProvider(),
   ]
 );

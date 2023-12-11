@@ -1,0 +1,14 @@
+{
+  "name": "Grass Snake",
+  "image": "https://ipfs.io/ipfs/QmSXX8anBRMwGRm3TMiheCTchAZTK22R7uucmGsk8UzoG2",
+  "attributes": {
+    "evolutionable": false,
+    "rarity": "Epic",
+    "type": "Grass",
+    "hp": 540,
+    "attack": 70,
+    "defend": 80,
+    "speed": 60,
+    "skills": ["Grass Double Cut", "Plant Spike"]
+  }
+}

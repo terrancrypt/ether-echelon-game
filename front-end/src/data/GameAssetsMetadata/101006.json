@@ -1,0 +1,14 @@
+{
+  "name": "Ghost Eye",
+  "image": "https://ipfs.io/ipfs/QmV76BsHQ6s1sUd1Vfs46zM9DDJ3W1FsaJMAzKk4pV1zya",
+  "attributes": {
+    "evolutionable": false,
+    "rarity": "Normal",
+    "type": "Water",
+    "hp": 450,
+    "attack": 30,
+    "defend": 50,
+    "speed": 40,
+    "skills": ["Slash", "Water Jet"]
+  }
+}

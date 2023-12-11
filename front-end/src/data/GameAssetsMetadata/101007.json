@@ -1,0 +1,14 @@
+{
+  "name": "Flam",
+  "image": "https://ipfs.io/ipfs/QmRSRbYKDXa9LkV9TPuf5LUcsu6FwJ4r5wBDaFem6RFj6c",
+  "attributes": {
+    "evolutionable": true,
+    "rarity": "Rare",
+    "type": "Fire",
+    "hp": 480,
+    "attack": 60,
+    "defend": 40,
+    "speed": 50,
+    "skills": ["Increase Attack", "Inflame"]
+  }
+}
