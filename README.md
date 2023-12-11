@@ -27,4 +27,12 @@ All assets in the game (including Ethers Beasts and Other Items) will be minted 
 
 TokenURI() of this contract will be stored as a folder at IPFS. Where it will be easy to update and change game parameters for game balance and gameplay improvement.
 
+## Game Play
+
+## Map
+- Town
+
+## Beasts
+Initially I planned to add about 40 Ether Beasts in the game but then due to too much work I reduced it to 22 Ether Beasts.
+
 ## The Future
