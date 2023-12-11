@@ -18,7 +18,7 @@ const Incubation = () => {
   const authState = useSelector((state: RootState) => state.authSlice);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [dataItems, setDataItems] = useState();
-  const [singleItemData, setSingleItemData] = useState();
+  const [singleItemData, setSingleItemData] = useState(null);
   const [messageApi, contextHolder] = message.useMessage();
 
   const fetchIncubation = async () => {
@@ -29,6 +29,7 @@ const Incubation = () => {
           (authState as any).accountAddr,
           key
         );
+        console.log(key, isIncubate);
 
         if (isIncubate) {
           const startTime = await getEggIncubatedStartTime(
@@ -98,6 +99,7 @@ const Incubation = () => {
 
   const handleCloseModal = () => {
     setIsModalVisible(false);
+    setSingleItemData(null);
   };
 
   const handleOutsideClick = (e: MouseEvent) => {

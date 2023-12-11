@@ -554,7 +554,7 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
 
         if (!canHatch) revert EEEngine_EggCannotHatch();
 
-        s_isEggIncubated[account][_eggId] == false;
+        s_isEggIncubated[account][_eggId] = false;
 
         _burnGameAssets(address(this), _eggId, 1);
         _mintGameAssets(account, beastId, 1, "");

@@ -18,7 +18,7 @@ const BeastsOf = () => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [dataItems, setDataItems] = useState();
-  const [singleItemData, setSingleItemData] = useState();
+  const [singleItemData, setSingleItemData] = useState(null);
   const authState = useSelector((state: RootState) => state.authSlice);
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -109,6 +109,7 @@ const BeastsOf = () => {
 
   const handleCloseModal = () => {
     setIsModalVisible(false);
+    setSingleItemData(null);
   };
 
   const handleOutsideClick = (e: MouseEvent) => {

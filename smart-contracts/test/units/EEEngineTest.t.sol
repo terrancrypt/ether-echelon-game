@@ -597,6 +597,12 @@ contract EEEngineTest is Test {
         engine.incubateAnEgg(accountAddr, eggIdForIncubate);
         vm.warp(1641070800 + HATCHING_TIME);
         vm.roll(100);
+        bool isIncubateBeforeHatch = engine.getAccountIsIncubateEgg(
+            accountAddr,
+            eggIdForIncubate
+        );
+
+        assertEq(isIncubateBeforeHatch, true);
         engine.hatchEgg(accountAddr, eggIdForIncubate);
         vm.stopPrank();
 
@@ -616,6 +622,12 @@ contract EEEngineTest is Test {
         );
 
         assertEq(beastBalanceInAccount, 1);
+
+        bool isIncubate = engine.getAccountIsIncubateEgg(
+            accountAddr,
+            eggIdForIncubate
+        );
+        assertEq(isIncubate, false);
     }
 
     function test_revertIncubateEggIfEggIdInvalid() public {

@@ -24,7 +24,7 @@ const Bag = () => {
   const authState = useSelector((state: RootState) => state.authSlice);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [dataItems, setDataItems] = useState();
-  const [singleItemData, setSingleItemData] = useState();
+  const [singleItemData, setSingleItemData] = useState(null);
   const [messageApi, contextHolder] = message.useMessage();
 
   const fetchBag = async () => {
@@ -162,6 +162,7 @@ const Bag = () => {
 
   const handleCloseModal = () => {
     setIsModalVisible(false);
+    setSingleItemData(null);
   };
 
   const handleOutsideClick = (e: MouseEvent) => {
