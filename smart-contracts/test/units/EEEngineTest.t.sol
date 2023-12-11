@@ -80,7 +80,8 @@ contract EEEngineTest is Test {
             address(etherEchelonToken),
             vrfSubId,
             address(vrfCoordinatorMock),
-            VRF_KEY_HASH_MUMBAI
+            VRF_KEY_HASH_MUMBAI,
+            1000000
         );
         vm.startPrank(owner);
         accountNft.transferOwnership(address(engine));
@@ -330,7 +331,7 @@ contract EEEngineTest is Test {
         etherEchelonToken.faucet();
         etherEchelonToken.approve(address(engine), GAME_ASSETS_PRICE_1);
         address accountAddr = _userCreateAnAccountNft();
-        engine.mintGameAssets(accountAddr, TOKEN_ID_GAME_ASSETS, 1);
+        engine.mintGameAsset(accountAddr, TOKEN_ID_GAME_ASSETS, 1);
         accountNft.safeTransferFrom(user1, user2, TOKEN_ACCOUNT_ID_1);
         vm.stopPrank();
 
@@ -418,7 +419,7 @@ contract EEEngineTest is Test {
         etherEchelonToken.faucet();
         etherEchelonToken.approve(address(engine), GAME_ASSETS_PRICE_1);
         address accountAddr = _userCreateAnAccountNft();
-        engine.mintGameAssets(accountAddr, TOKEN_ID_GAME_ASSETS, 1);
+        engine.mintGameAsset(accountAddr, TOKEN_ID_GAME_ASSETS, 1);
         vm.stopPrank();
 
         uint256 expectedBalance = gameAssetsNft.balanceOf(
@@ -439,7 +440,7 @@ contract EEEngineTest is Test {
         etherEchelonToken.faucet();
         etherEchelonToken.approve(address(engine), GAME_ASSETS_PRICE_1);
         address accountAddr = _userCreateAnAccountNft();
-        engine.mintGameAssets(accountAddr, TOKEN_ID_GAME_ASSETS, 1);
+        engine.mintGameAsset(accountAddr, TOKEN_ID_GAME_ASSETS, 1);
 
         ERC6551Account(payable(accountAddr)).transferERC1551(
             user2,
@@ -470,8 +471,8 @@ contract EEEngineTest is Test {
         address accountAddr = _userCreateAnAccountNft();
         etherEchelonToken.faucet();
         etherEchelonToken.approve(address(engine), GAME_ASSETS_PRICE_1 * 2);
-        engine.mintGameAssets(accountAddr, TOKEN_ID_GAME_ASSETS, 1);
-        engine.mintGameAssets(accountAddr, 101003, 1);
+        engine.mintGameAsset(accountAddr, TOKEN_ID_GAME_ASSETS, 1);
+        engine.mintGameAsset(accountAddr, 101003, 1);
         ERC6551Account(payable(accountAddr)).safeApproveERC1155(
             address(gameAssetsNft),
             address(engine),
@@ -538,7 +539,7 @@ contract EEEngineTest is Test {
         address accountAddr = _userCreateAnAccountNft();
         etherEchelonToken.faucet();
         etherEchelonToken.approve(address(engine), GAME_ASSETS_PRICE_1);
-        engine.mintGameAssets(accountAddr, eggIdForIncubate, 1);
+        engine.mintGameAsset(accountAddr, eggIdForIncubate, 1);
         ERC6551Account(payable(accountAddr)).safeApproveERC1155(
             address(gameAssetsNft),
             address(engine),
@@ -585,7 +586,7 @@ contract EEEngineTest is Test {
         address accountAddr = _userCreateAnAccountNft();
         etherEchelonToken.faucet();
         etherEchelonToken.approve(address(engine), GAME_ASSETS_PRICE_1);
-        engine.mintGameAssets(accountAddr, eggIdForIncubate, 1);
+        engine.mintGameAsset(accountAddr, eggIdForIncubate, 1);
         ERC6551Account(payable(accountAddr)).safeApproveERC1155(
             address(gameAssetsNft),
             address(engine),
@@ -671,7 +672,7 @@ contract EEEngineTest is Test {
         address accountAddr = _userCreateAnAccountNft();
         etherEchelonToken.faucet();
         etherEchelonToken.approve(address(engine), GAME_ASSETS_PRICE_1);
-        engine.mintGameAssets(accountAddr, eggIdForIncubate, 1);
+        engine.mintGameAsset(accountAddr, eggIdForIncubate, 1);
         ERC6551Account(payable(accountAddr)).safeApproveERC1155(
             address(gameAssetsNft),
             address(engine),
@@ -725,7 +726,7 @@ contract EEEngineTest is Test {
         address accountAddr = _userCreateAnAccountNft();
         etherEchelonToken.faucet();
         etherEchelonToken.approve(address(engine), GAME_ASSETS_PRICE_1);
-        engine.mintGameAssets(accountAddr, chestId, 1);
+        engine.mintGameAsset(accountAddr, chestId, 1);
         ERC6551Account(payable(accountAddr)).safeApproveERC1155(
             address(gameAssetsNft),
             address(engine),

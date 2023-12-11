@@ -73,6 +73,7 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
     VRFCoordinatorV2Interface private s_vrfCoordinator;
     bytes32 private s_vrfKeyHash;
     uint64 private s_vrfSubscriptionId;
+    uint32 private s_vrfCallbackGasLimit;
     struct VRFRequestInfor {
         bool exists;
         bool fulfilled;
@@ -164,7 +165,8 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
         address etherEchelonToken,
         uint64 vrfSubscriptionId,
         address vrfCoordinator,
-        bytes32 vrfKeyHash
+        bytes32 vrfKeyHash,
+        uint32 vrfCallbackGasLimit
     ) Ownable(initialOwner) VRFConsumerBaseV2(vrfCoordinator) {
         i_erc6551Registry = IERC6551Registry(erc6551Registry);
         i_account = AccountNFT(accountNftAddress);
@@ -173,6 +175,7 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
         s_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinator);
         s_vrfSubscriptionId = vrfSubscriptionId;
         s_vrfKeyHash = vrfKeyHash;
+        s_vrfCallbackGasLimit = vrfCallbackGasLimit;
     }
 
     ///////////////////////////////////////////////////
@@ -183,11 +186,13 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
     function changeVrfInfor(
         uint64 newSubscriptionId,
         address newVrfCoordinator,
-        bytes32 newKeyHash
+        bytes32 newKeyHash,
+        uint32 newCallbackGasLimit
     ) public onlyOwner {
         s_vrfSubscriptionId = newSubscriptionId;
         s_vrfCoordinator = VRFCoordinatorV2Interface(newVrfCoordinator);
         s_vrfKeyHash = newKeyHash;
+        s_vrfCallbackGasLimit = newCallbackGasLimit;
         emit VRFInformationChanged(
             newSubscriptionId,
             newVrfCoordinator,
@@ -229,6 +234,7 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
         i_gameAssets.updateTokenState(_tokenId, _state);
     }
 
+    /// @dev This function helps determine the starting monster, where an account can receive 1 of their starting monster.
     function setStartingBeast(
         uint256 _beastId,
         bool isStartingBeast
@@ -407,6 +413,7 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
         return payable(accountAddr);
     }
 
+    /// @notice Enables an account to receive a free starter beast to participate in the game, and can choose a predetermined beast
     function receiveStartingBeast(uint256 _tokenId, uint256 _beastId) public {
         if (i_account.ownerOf(_tokenId) != msg.sender) {
             revert EEEngine_MustBeOwner();
@@ -435,7 +442,7 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
     }
 
     /// @notice This function allows users (or players) to mint their game assets in the game, by buying them with Ether Echelon Tokens or minting them for free because there will be assets priced at 0.
-    function mintGameAssets(
+    function mintGameAsset(
         address account,
         uint256 _tokenId,
         uint256 _amount
@@ -460,6 +467,7 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
         _mintGameAssets(account, _tokenId, _amount, "");
     }
 
+    /// @notice Helps an account evolve their beast by burning an existing beast and can evolve + condition items to mint a new, more powerful beast.
     function evolveBeast(address account, uint256 _beastIdForEvolve) public {
         bool isBeastIsExists = i_gameAssets.getIsTokenExists(_beastIdForEvolve);
         if (!isBeastIsExists) {
@@ -498,6 +506,7 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
         emit BeastEvolved(_beastIdForEvolve, evolveInfor.evolveToBeastId);
     }
 
+    /// @notice This function will help an account stake their beast tokens into the contract (considered incubation of eggs) after a specified period of time they can hatch the eggs.
     function incubateAnEgg(address account, uint256 _eggId) public {
         bool isEggIdExists = i_gameAssets.getIsTokenExists(_eggId);
         uint256 balanceEgg = i_gameAssets.balanceOf(account, _eggId);
@@ -522,6 +531,7 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
         emit EggIncubated(account, _eggId, block.timestamp);
     }
 
+    /// @notice Function serves to hatch a player's egg that has been incubated and the egg can hatch.
     function hatchEgg(address account, uint256 _eggId) public {
         if (s_isEggIncubated[account][_eggId] == false) {
             revert EEEngine_EggNotIncubate();
@@ -541,6 +551,7 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
         emit EggHatched(account, _eggId, beastId);
     }
 
+    /// @dev Helps open a chest, each chest will randomly open certain items of that chest through Chainlink VRF.
     function openChest(
         address account,
         uint256 _chestId
@@ -566,7 +577,7 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
             s_vrfKeyHash,
             s_vrfSubscriptionId,
             3,
-            500000,
+            s_vrfCallbackGasLimit,
             NUMB_WORDS
         );
 
@@ -678,6 +689,7 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
         uint256 randomGameAssetId = gameAssetsInChest[randomItemIndex];
 
         s_vrfRequestInfor[_requestId].fulfilled = true;
+        s_vrfRequestInfor[_requestId].exists = false;
 
         _burnGameAssets(address(this), chestId, 1);
         _mintGameAssets(account, randomGameAssetId, 1, "");
@@ -725,9 +737,22 @@ contract EEEngine is Ownable, IERC165, IERC1155Receiver, VRFConsumerBaseV2 {
         return s_incubatedInfor[account][_tokenId];
     }
 
+    function getAccountIsIncubateEgg(
+        address account,
+        uint256 _tokenId
+    ) public view returns (bool) {
+        return s_isEggIncubated[account][_tokenId];
+    }
+
     function getChestInfor(
         uint256 _tokenId
     ) public view returns (uint256[] memory) {
         return s_chestIdToInfor[_tokenId];
+    }
+
+    function getVrfRequestInfor(
+        uint256 _requestId
+    ) public view returns (VRFRequestInfor memory) {
+        return s_vrfRequestInfor[_requestId];
     }
 }
