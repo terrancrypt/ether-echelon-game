@@ -1,6 +1,6 @@
-import professorHourseCollisions from "../../../public/images/maps/ProfessorHouse/collisionsData";
-import collisionsTownData from "../../../public/images/maps/Town/collisionsData";
-import collisionsTown2Data from "../../../public/images/maps/Town2/conlisionsData";
+import professorHouseCollisions from "../../assets/collisionsData/professorHouseCollisions/collisionsData";
+import collisionsTownData from "../../assets/collisionsData/town/collisionsData";
+import collisionsTown2Data from "../../assets/collisionsData/town2/conlisionsData";
 import { OverworldMapsData } from "./classes/Overworld";
 import Person from "./classes/Person";
 import { asGridCoord, getCollisionsData, withGrid } from "./utils/utils";
@@ -43,7 +43,7 @@ const initData: OverworldMapsData = {
         ],
       }),
     },
-    walls: getCollisionsData(professorHourseCollisions, 16, 122),
+    walls: getCollisionsData(professorHouseCollisions, 16, 122),
     cutsceneSpaces: {
       [asGridCoord(13, 3)]: [
         {
